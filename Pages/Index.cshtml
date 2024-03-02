@@ -1,0 +1,44 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#game-start-button").click(function () {
+
+            const grid = document.getElementById("game-grid");
+
+            const size = 10;
+
+            var columns = "auto";
+
+            for (let i = 1; i < size; i++) {
+
+                columns += " auto";
+            }
+
+            grid.style.gridTemplateColumns = columns;
+
+            for (let i = 0; i < size * size; i++) {
+
+                let tag = document.createElement("div");
+                tag.className = "square";
+                tag.style = "aspect-ratio: 1/ 1;display: block;align-items: center;background-color: black;"
+
+                grid.appendChild(tag);
+            }
+        });
+    });
+</script>
+
+<div class="text-center">
+    <h1 class="display-4">Snake game</h1>
+    <p>Press "Start" to begin</p>
+    <input type="button" value="Start" id="game-start-button" />
+    <div id="game">
+        <div id="game-grid"></div>
+    </div>
+</div>
