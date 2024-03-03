@@ -39,3 +39,11 @@ body {
     align-items: center;
     background-color: lightgrey;
 }
+
+.square[head]{
+    background-color: green;
+}
+
+.square[snake]{
+    background-color: lightgreen;
+}
