@@ -1,19 +1,29 @@
-﻿const { event } = require("jquery");
+﻿function startGame(gridTag, sizeNumber) {
 
-function generateBoard(gridTag) {
+    clearBoard(gridTag);
+    generateBoard(gridTag, sizeNumber);
+}
 
-    const size = 10;
+function clearBoard(gridTag) {
+
+    while (gridTag.hasChildNodes()) {
+
+        gridTag.removeChild(gridTag.firstElementChild);
+    }
+}
+
+function generateBoard(gridTag, sizeNumber) {
 
     var columns = "auto";
 
-    for (let i = 1; i < size; i++) {
+    for (let i = 1; i < sizeNumber; i++) {
 
         columns += " auto";
     }
 
     gridTag.style.gridTemplateColumns = columns;
 
-    for (let i = 0; i < size * size; i++) {
+    for (let i = 0; i < sizeNumber * sizeNumber; i++) {
 
         let tag = document.createElement("div");
         tag.className = "square";
