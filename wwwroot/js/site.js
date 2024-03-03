@@ -1,4 +1,24 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿const { event } = require("jquery");
 
-// Write your JavaScript code.
+function generateBoard(gridTag) {
+
+    const size = 10;
+
+    var columns = "auto";
+
+    for (let i = 1; i < size; i++) {
+
+        columns += " auto";
+    }
+
+    gridTag.style.gridTemplateColumns = columns;
+
+    for (let i = 0; i < size * size; i++) {
+
+        let tag = document.createElement("div");
+        tag.className = "square";
+        tag.style = "aspect-ratio: 1/ 1;display: block;align-items: center;background-color: black;"
+
+        gridTag.appendChild(tag);
+    }
+}
