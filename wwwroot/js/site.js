@@ -17,7 +17,6 @@ function generateBoard(gridTag) {
 
         let tag = document.createElement("div");
         tag.className = "square";
-        tag.style = "aspect-ratio: 1/ 1;display: block;align-items: center;background-color: black;"
 
         gridTag.appendChild(tag);
     }
