@@ -5,6 +5,28 @@ const LEFT = "left";
 
 const HEAD_ATTR = "head";
 const SNAKE_ATTR = "snake";
+
+var direction = DOWN;
+
+$(window.addEventListener('keydown', function (e) {
+
+    switch (e.key) {
+
+        case 's':
+            direction = DOWN;
+            break;
+        case 'w':
+            direction = UP;
+            break;
+        case 'd':
+            direction = RIGHT;
+            break;
+        case 'a':
+            direction = LEFT;
+    }
+
+}, false))
+
 function startGame(gridTag, sizeNumber) {
 
     clearBoard(gridTag);
@@ -12,7 +34,7 @@ function startGame(gridTag, sizeNumber) {
 
     let snake = generateSnake(gridTag, sizeNumber);
 
-    let gameState = { grid: gridTag, size: sizeNumber, snake: snake, direction: DOWN};
+    let gameState = { grid: gridTag, size: sizeNumber, snake: snake};
 
     gameTick(gameState);
 }
@@ -65,16 +87,18 @@ function getTile(gridTag, sizeNumber, pos) {
 function gameTick(gameState) {
 
     gameState = moveSnake(gameState);
-    sleep(1000).then(() => { gameTick(gameState) });
+    sleep(250).then(() => { gameTick(gameState) });
 }
 
 function moveSnake(gamestate) {
 
     const oldHeadPos = Array.from(gamestate.snake.head);
-    const newHeadPos = getPositionInDirection(gamestate.snake.head, gamestate.direction);
+    const newHeadPos = getPositionInDirection(gamestate.snake.head, direction);
 
-    //check if snake can move there
-    //fail the game if not
+    if (isOutsideTheBoard(newHeadPos, gamestate.size)) {
+        endGame();
+        return;
+    }
 
     const endPosTile = getTile(gamestate.grid, gamestate.size, gamestate.snake.end);
     const oldHeadPosTile = getTile(gamestate.grid, gamestate.size, gamestate.snake.head);
@@ -120,6 +144,26 @@ function getPositionInDirection(pos, direction) {
     return newPos;
 }
 
+function isOutsideTheBoard(pos, size) {
+
+    if (pos[0] < 0)
+        return true;
+
+    if (pos[1] < 0)
+        return true;
+
+    if (pos[0] >= size)
+        return true;
+
+    if (pos[1] >= size)
+        return true;
+
+    return false;
+}
+
+function endGame() {
+
+}
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
