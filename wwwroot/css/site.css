@@ -20,3 +20,34 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+#game {
+    aspect-ratio: 1/1;
+    width: 60vmin;
+    margin: auto;
+}
+
+#game-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 2%;
+}
+
+.square {
+    aspect-ratio: 1/ 1;
+    display: block;
+    align-items: center;
+    background-color: lightgrey;
+}
+
+.square[head]{
+    background-color: green;
+}
+
+.square[snake]{
+    background-color: lightgreen;
+}
+
+.square[fruit]{
+    background-color: red;
+}
