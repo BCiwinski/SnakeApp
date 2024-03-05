@@ -175,7 +175,7 @@ function spawnFruitRandom(grid, sizeNumber, chanceInvertedNumber, positionTriesN
 
         for (let j = 0; j < positionTriesNumber; j++) {
 
-            let rand_x = Math.floor(Math.random() * (sizeNumber - 1));
+            let rand_x = Math.round(Math.random() * (sizeNumber - 1));
             let rand_y = Math.round(Math.random() * (sizeNumber - 1));
 
             if (grid[rand_x][rand_y] == EMPTY) {
@@ -208,6 +208,11 @@ function gameTick(gameState, gridElement, messageElement) {
 }
 
 function moveSnake(gameState, gridElement, messageElement) {
+
+    if (isWon(gameState)) {
+        endGame(gameState, messageElement, "Snake won!");
+        return gameState;
+    }
 
     const oldHeadPos = Array.from(gameState.snake.head);
     const newHeadPos = getPositionInDirection(gameState.snake.head, Direction);
@@ -289,6 +294,24 @@ function isOutsideTheBoard(pos, size) {
 function isOnSnake(pos, gameState) {
 
     return gameState.grid[pos[0]][pos[1]] == SNAKE;
+}
+
+function isWon(gameState) {
+
+    for (let i = 0; i < gameState.size; i++) {
+
+        for (let j = 0; j < gameState.size; j++) {
+
+            tile = gameState.grid[i][j]
+
+            if (tile == EMPTY || tile == FRUIT) {
+
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 function posAreEqual(pos1, pos2) {
