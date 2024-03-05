@@ -6,28 +6,36 @@ const LEFT = "left";
 const HEAD_ATTR = "head";
 const SNAKE_ATTR = "snake";
 
-var direction = DOWN;
+var Direction = DOWN;
+var GameInProgess = false;
 
 $(window.addEventListener('keydown', function (e) {
 
     switch (e.key) {
-
         case 's':
-            direction = DOWN;
+            Direction = DOWN;
             break;
         case 'w':
-            direction = UP;
+            Direction = UP;
             break;
         case 'd':
-            direction = RIGHT;
+            Direction = RIGHT;
             break;
         case 'a':
-            direction = LEFT;
+            Direction = LEFT;
+            break;
+    }
+
+    if ((e.key == 's' || 'a' || 's' || 'd') && !GameInProgess) {
+
+        startGame($('#game-grid')[0], 10, $('#game-message')[0]);
     }
 
 }, false))
 
 function startGame(gridElement, sizeNumber, messageElement) {
+
+    GameInProgess = true;
 
     clearBoard(gridElement);
     generateBoardElements(gridElement, sizeNumber);
@@ -98,7 +106,7 @@ function gameTick(gameState, gridElement, messageElement) {
 function moveSnake(gamestate, gridElement, messageElement) {
 
     const oldHeadPos = Array.from(gamestate.snake.head);
-    const newHeadPos = getPositionInDirection(gamestate.snake.head, direction);
+    const newHeadPos = getPositionInDirection(gamestate.snake.head, Direction);
 
     if (isOutsideTheBoard(newHeadPos, gamestate.size)) {
         endGame(gamestate, messageElement);
@@ -170,6 +178,8 @@ function endGame(gamestate, messageElement) {
 
     gamestate.ended = true;
     messageElement.innerText = "Snake hit his head :(";
+
+    GameInProgess = false;
 }
 
 function sleep(ms) {
