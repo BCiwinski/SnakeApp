@@ -19,6 +19,10 @@ const GameObjToAttr =
 var Direction = DOWN;
 var GameInProgess = false;
 
+$(function () {
+    prepareGame($('#game-grid')[0], 10);
+})
+
 $(window.addEventListener('keydown', function (e) {
 
     switch (e.key) {
@@ -48,7 +52,7 @@ function startGame(gridElement, sizeNumber, messageElement) {
     GameInProgess = true;
     let gameState = prepareGame(gridElement, sizeNumber);
 
-    sleep(250).then(() => { gameTick(gameState, gridElement, messageElement) });
+    sleep(1000).then(() => { gameTick(gameState, gridElement, messageElement) });
 }
 
 function prepareGame(gridElement, sizeNumber) {
