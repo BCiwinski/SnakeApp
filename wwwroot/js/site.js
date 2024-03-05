@@ -46,6 +46,12 @@ $(window.addEventListener('keydown', function (e) {
 function startGame(gridElement, sizeNumber, messageElement) {
 
     GameInProgess = true;
+    let gameState = prepareGame(gridElement, sizeNumber);
+
+    sleep(250).then(() => { gameTick(gameState, gridElement, messageElement) });
+}
+
+function prepareGame(gridElement, sizeNumber) {
 
     clearBoard(gridElement);
     generateBoardElements(gridElement, sizeNumber);
@@ -54,11 +60,11 @@ function startGame(gridElement, sizeNumber, messageElement) {
 
     let snake = generateSnake(grid, sizeNumber);
 
-    let gameState = { gridElement: gridElement, grid: grid, size: sizeNumber, snake: snake, ended: false};
+    let gameState = { gridElement: gridElement, grid: grid, size: sizeNumber, snake: snake, ended: false };
 
     updateGridElements(gameState, gridElement);
 
-    sleep(250).then(() => { gameTick(gameState, gridElement, messageElement) });
+    return gameState;
 }
 
 function clearBoard(gridElement) {
