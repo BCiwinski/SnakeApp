@@ -27,27 +27,27 @@ $(window.addEventListener('keydown', function (e) {
 
 }, false))
 
-function startGame(gridTag, sizeNumber) {
+function startGame(gridElement, sizeNumber, messageElement) {
 
-    clearBoard(gridTag);
-    generateBoard(gridTag, sizeNumber);
+    clearBoard(gridElement);
+    generateBoardElements(gridElement, sizeNumber);
 
-    let snake = generateSnake(gridTag, sizeNumber);
+    let snake = generateSnake(gridElement, sizeNumber);
 
-    let gameState = { grid: gridTag, size: sizeNumber, snake: snake};
+    let gameState = { gridElement: gridElement, size: sizeNumber, snake: snake, ended: false};
 
-    gameTick(gameState);
+    gameTick(gameState, gridElement, messageElement);
 }
 
-function clearBoard(gridTag) {
+function clearBoard(gridElement) {
 
-    while (gridTag.hasChildNodes()) {
+    while (gridElement.hasChildNodes()) {
 
-        gridTag.removeChild(gridTag.firstElementChild);
+        gridElement.removeChild(gridElement.firstElementChild);
     }
 }
 
-function generateBoard(gridTag, sizeNumber) {
+function generateBoardElements(gridElement, sizeNumber) {
 
     let columns = "auto";
 
@@ -56,21 +56,21 @@ function generateBoard(gridTag, sizeNumber) {
         columns += " auto";
     }
 
-    gridTag.style.gridTemplateColumns = columns;
+    gridElement.style.gridTemplateColumns = columns;
 
     for (let i = 0; i < sizeNumber * sizeNumber; i++) {
 
         let tag = document.createElement("div");
         tag.className = "square";
 
-        gridTag.appendChild(tag);
+        gridElement.appendChild(tag);
     }
 }
 
-function generateSnake(gridTag, sizeNumber) {
+function generateSnake(gridElement, sizeNumber) {
 
-    let bodyTile = getTile(gridTag, sizeNumber, [0, 0]);
-    let headTile = getTile(gridTag, sizeNumber, [0, 1]);
+    let bodyTile = getTile(gridElement, sizeNumber, [0, 0]);
+    let headTile = getTile(gridElement, sizeNumber, [0, 1]);
 
     bodyTile.setAttribute(SNAKE_ATTR, "");
     headTile.setAttribute(HEAD_ATTR, "");
@@ -79,30 +79,35 @@ function generateSnake(gridTag, sizeNumber) {
 }
 
 //pos - position - 2 value int array, so: pos[0] - x, pos[1] - y
-function getTile(gridTag, sizeNumber, pos) {
+function getTile(gridElement, sizeNumber, pos) {
 
-    return gridTag.childNodes[pos[0] + pos[1] * sizeNumber];
+    return gridElement.childNodes[pos[0] + pos[1] * sizeNumber];
 }
 
-function gameTick(gameState) {
+function gameTick(gameState, gridElement, messageElement) {
 
-    gameState = moveSnake(gameState);
-    sleep(250).then(() => { gameTick(gameState) });
+    gameState = moveSnake(gameState, gridElement, messageElement);
+
+    if (gameState.ended) {
+        return;
+    }
+
+    sleep(250).then(() => { gameTick(gameState, gridElement, messageElement) });
 }
 
-function moveSnake(gamestate) {
+function moveSnake(gamestate, gridElement, messageElement) {
 
     const oldHeadPos = Array.from(gamestate.snake.head);
     const newHeadPos = getPositionInDirection(gamestate.snake.head, direction);
 
     if (isOutsideTheBoard(newHeadPos, gamestate.size)) {
-        endGame();
-        return;
+        endGame(gamestate, messageElement);
+        return gamestate;
     }
 
-    const endPosTile = getTile(gamestate.grid, gamestate.size, gamestate.snake.end);
-    const oldHeadPosTile = getTile(gamestate.grid, gamestate.size, gamestate.snake.head);
-    const newHeadPosTile = getTile(gamestate.grid, gamestate.size, newHeadPos);
+    const endPosTile = getTile(gridElement, gamestate.size, gamestate.snake.end);
+    const oldHeadPosTile = getTile(gridElement, gamestate.size, gamestate.snake.head);
+    const newHeadPosTile = getTile(gridElement, gamestate.size, newHeadPos);
 
     gamestate.snake.body.push(oldHeadPos);
 
@@ -161,8 +166,10 @@ function isOutsideTheBoard(pos, size) {
     return false;
 }
 
-function endGame() {
+function endGame(gamestate, messageElement) {
 
+    gamestate.ended = true;
+    messageElement.innerText = "Snake hit his head :(";
 }
 
 function sleep(ms) {
