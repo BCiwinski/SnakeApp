@@ -12,8 +12,8 @@ const SNAKE = 2;
 
 const GameObjToAttr =
 {
-    HEAD: HEAD_ATTR,
-    SNAKE: SNAKE_ATTR
+    1: HEAD_ATTR,
+    2: SNAKE_ATTR
 }
 
 var Direction = DOWN;
@@ -52,11 +52,11 @@ function startGame(gridElement, sizeNumber, messageElement) {
 
     let grid = generateGrid(sizeNumber);
 
-    let snake = generateSnake(gridElement, sizeNumber);
+    let snake = generateSnake(grid, sizeNumber);
 
     let gameState = { gridElement: gridElement, grid: grid, size: sizeNumber, snake: snake, ended: false};
 
-    //updateGridElements(gameState, gridElement);
+    updateGridElements(gameState, gridElement);
 
     sleep(250).then(() => { gameTick(gameState, gridElement, messageElement) });
 }
@@ -129,13 +129,10 @@ function generateGrid(sizeNumber) {
     return result;
 }
 
-function generateSnake(gridElement, sizeNumber) {
+function generateSnake(grid, sizeNumber) {
 
-    let bodyTile = getTile(gridElement, sizeNumber, [0, 0]);
-    let headTile = getTile(gridElement, sizeNumber, [0, 1]);
-
-    bodyTile.setAttribute(SNAKE_ATTR, "");
-    headTile.setAttribute(HEAD_ATTR, "");
+    grid[0][0] = SNAKE;
+    grid[0][1] = HEAD
 
     return { head: [0, 1], body: [[0, 0]], end: [0, 0]};
 }
@@ -149,6 +146,7 @@ function getTile(gridElement, sizeNumber, pos) {
 function gameTick(gameState, gridElement, messageElement) {
 
     gameState = moveSnake(gameState, gridElement, messageElement);
+    updateGridElements(gameState, gridElement);
 
     if (gameState.ended) {
         return;
@@ -157,36 +155,31 @@ function gameTick(gameState, gridElement, messageElement) {
     sleep(250).then(() => { gameTick(gameState, gridElement, messageElement) });
 }
 
-function moveSnake(gamestate, gridElement, messageElement) {
+function moveSnake(gameState, gridElement, messageElement) {
 
-    const oldHeadPos = Array.from(gamestate.snake.head);
-    const newHeadPos = getPositionInDirection(gamestate.snake.head, Direction);
+    const oldHeadPos = Array.from(gameState.snake.head);
+    const newHeadPos = getPositionInDirection(gameState.snake.head, Direction);
 
-    if (isOutsideTheBoard(newHeadPos, gamestate.size)) {
-        endGame(gamestate, messageElement);
-        return gamestate;
+    if (isOutsideTheBoard(newHeadPos, gameState.size)) {
+        endGame(gameState, messageElement);
+        return gameState;
     }
 
-    const endPosTile = getTile(gridElement, gamestate.size, gamestate.snake.end);
-    const oldHeadPosTile = getTile(gridElement, gamestate.size, gamestate.snake.head);
-    const newHeadPosTile = getTile(gridElement, gamestate.size, newHeadPos);
+    gameState.snake.body.push(oldHeadPos);
 
-    gamestate.snake.body.push(oldHeadPos);
+    //if snake hasnt eaten a fruit now, move his end
+    gameState.grid[gameState.snake.end[0]][gameState.snake.end[1]] = EMPTY;
+    gameState.snake.body.shift();
+    gameState.snake.end = gameState.snake.body[0];
 
-    //if snake hasnt eaten a fruit now, move his end too
-    gamestate.snake.body.shift();
-    gamestate.snake.end = gamestate.snake.body[0];
+    //move snake's head
+    gameState.snake.head = newHeadPos;
+    gameState.grid[newHeadPos[0]][newHeadPos[1]] = HEAD;
 
-    gamestate.snake.head = newHeadPos;
+    //part of his body follows where his head was
+    gameState.grid[oldHeadPos[0]][oldHeadPos[1]] = SNAKE;
 
-    newHeadPosTile.setAttribute(HEAD_ATTR, "");
-    oldHeadPosTile.setAttribute(SNAKE_ATTR, "");
-    oldHeadPosTile.removeAttribute(HEAD_ATTR);
-
-    //if snake hasnt eaten a friut now, move his end too (visually)
-    endPosTile.removeAttribute(SNAKE_ATTR);
-
-    return gamestate;
+    return gameState;
 }
 
 function getPositionInDirection(pos, direction) {
@@ -228,9 +221,9 @@ function isOutsideTheBoard(pos, size) {
     return false;
 }
 
-function endGame(gamestate, messageElement) {
+function endGame(gameState, messageElement) {
 
-    gamestate.ended = true;
+    gameState.ended = true;
     messageElement.innerText = "Snake hit his head :(";
 
     GameInProgess = false;
