@@ -6,6 +6,16 @@ const LEFT = "left";
 const HEAD_ATTR = "head";
 const SNAKE_ATTR = "snake";
 
+const EMPTY = 0;
+const HEAD = 1;
+const SNAKE = 2;
+
+const GameObjToAttr =
+{
+    HEAD: HEAD_ATTR,
+    SNAKE: SNAKE_ATTR
+}
+
 var Direction = DOWN;
 var GameInProgess = false;
 
@@ -40,11 +50,15 @@ function startGame(gridElement, sizeNumber, messageElement) {
     clearBoard(gridElement);
     generateBoardElements(gridElement, sizeNumber);
 
+    let grid = generateGrid(sizeNumber);
+
     let snake = generateSnake(gridElement, sizeNumber);
 
-    let gameState = { gridElement: gridElement, size: sizeNumber, snake: snake, ended: false};
+    let gameState = { gridElement: gridElement, grid: grid, size: sizeNumber, snake: snake, ended: false};
 
-    gameTick(gameState, gridElement, messageElement);
+    //updateGridElements(gameState, gridElement);
+
+    sleep(250).then(() => { gameTick(gameState, gridElement, messageElement) });
 }
 
 function clearBoard(gridElement) {
@@ -73,6 +87,46 @@ function generateBoardElements(gridElement, sizeNumber) {
 
         gridElement.appendChild(tag);
     }
+}
+
+function updateGridElements(gameState, gridElement) {
+
+    for (let i = 0; i < gameState.size; i++) {
+
+        for (let j = 0; j < gameState.size; j++) {
+
+            const element = getTile(gridElement, gameState.size, [i, j]);
+
+            for (let obj in GameObjToAttr) {
+
+                element.removeAttribute(GameObjToAttr[obj]);
+
+                if (gameState.grid[i][j] == obj) {
+
+                    element.setAttribute(GameObjToAttr[obj], "");
+                }
+            }
+        }
+    }
+}
+
+function generateGrid(sizeNumber) {
+
+    let result = [];
+
+    for (let i = 0; i < sizeNumber; i++) {
+
+        let row = [];
+
+        for (let j = 0; j < sizeNumber; j++) {
+
+            row.push(EMPTY);
+        }
+
+        result.push(row);
+    }
+
+    return result;
 }
 
 function generateSnake(gridElement, sizeNumber) {
