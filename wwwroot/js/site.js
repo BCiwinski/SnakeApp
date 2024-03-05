@@ -5,15 +5,18 @@ const LEFT = "left";
 
 const HEAD_ATTR = "head";
 const SNAKE_ATTR = "snake";
+const FRUIT_ATTR = "fruit";
 
 const EMPTY = 0;
 const HEAD = 1;
 const SNAKE = 2;
+const FRUIT = 3;
 
 const GameObjToAttr =
 {
     1: HEAD_ATTR,
-    2: SNAKE_ATTR
+    2: SNAKE_ATTR,
+    3: FRUIT_ATTR
 }
 
 var Direction = DOWN;
@@ -25,18 +28,21 @@ $(function () {
 
 $(window.addEventListener('keydown', function (e) {
 
+    //Change direction-controlling var depending on user input
+    //Refuse changing the direction to the opposite - snake cant move that way
+
     switch (e.key) {
         case 's':
-            Direction = DOWN;
+            Direction = Direction == UP ? UP : DOWN;
             break;
         case 'w':
-            Direction = UP;
+            Direction = Direction == DOWN ? DOWN : UP;
             break;
         case 'd':
-            Direction = RIGHT;
+            Direction = Direction == LEFT ? LEFT : RIGHT;
             break;
         case 'a':
-            Direction = LEFT;
+            Direction = Direction == RIGHT ? RIGHT : LEFT;
             break;
     }
 
@@ -65,6 +71,8 @@ function prepareGame(gridElement, sizeNumber) {
     let snake = generateSnake(grid, sizeNumber);
 
     let gameState = { gridElement: gridElement, grid: grid, size: sizeNumber, snake: snake, ended: false };
+
+    spawnFruitRandom(grid, sizeNumber, 1, 1, 3);
 
     updateGridElements(gameState, gridElement);
 
@@ -147,6 +155,39 @@ function generateSnake(grid, sizeNumber) {
     return { head: [0, 1], body: [[0, 0]], end: [0, 0]};
 }
 
+/*A function for spawning a fruit on the grid
+PARAMETERS:
+gird - the grid to spawn fruit on - two dimensional int array
+sizeNumber - size of the grid - int
+chanceInvertedNumber - inverted chance to spawn a fruit with one run - int
+positionTriesNumber - number of tries to find an empty spot - int
+spawnTriesNumber - number of runs of the whole func - int
+*/
+function spawnFruitRandom(grid, sizeNumber, chanceInvertedNumber, positionTriesNumber, spawnTriesNumber) {
+
+    for (let i = 0; i < spawnTriesNumber; i++) {
+
+        let rand = Math.random() * chanceInvertedNumber;
+
+        if (rand > 1.0) {
+            return;
+        }
+
+        for (let j = 0; j < positionTriesNumber; j++) {
+
+            let rand_x = Math.floor(Math.random() * (sizeNumber - 1));
+            let rand_y = Math.round(Math.random() * (sizeNumber - 1));
+
+            if (grid[rand_x][rand_y] == EMPTY) {
+
+                grid[rand_x][rand_y] = FRUIT;
+                break;
+            }
+
+        }
+    }
+}
+
 //pos - position - 2 value int array, so: pos[0] - x, pos[1] - y
 function getTile(gridElement, sizeNumber, pos) {
 
@@ -177,10 +218,18 @@ function moveSnake(gameState, gridElement, messageElement) {
 
     gameState.snake.body.push(oldHeadPos);
 
-    //if snake hasnt eaten a fruit now, move his end
-    gameState.grid[gameState.snake.end[0]][gameState.snake.end[1]] = EMPTY;
-    gameState.snake.body.shift();
-    gameState.snake.end = gameState.snake.body[0];
+    //see if snake's head will be on a tile containing fruit
+    if (gameState.grid[newHeadPos[0]][newHeadPos[1]] == FRUIT) {
+
+        //add score
+    }
+    else {
+
+        //if snake wont be eating a frunt, move his end (remove one part)
+        gameState.grid[gameState.snake.end[0]][gameState.snake.end[1]] = EMPTY;
+        gameState.snake.body.shift();
+        gameState.snake.end = gameState.snake.body[0];
+    }
 
     //move snake's head
     gameState.snake.head = newHeadPos;

@@ -47,3 +47,7 @@ body {
 .square[snake]{
     background-color: lightgreen;
 }
+
+.square[fruit]{
+    background-color: red;
+}
