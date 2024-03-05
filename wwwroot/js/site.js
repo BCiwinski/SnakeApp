@@ -170,7 +170,7 @@ function spawnFruitRandom(grid, sizeNumber, chanceInvertedNumber, positionTriesN
         let rand = Math.random() * chanceInvertedNumber;
 
         if (rand > 1.0) {
-            return;
+            continue;
         }
 
         for (let j = 0; j < positionTriesNumber; j++) {
@@ -197,13 +197,14 @@ function getTile(gridElement, sizeNumber, pos) {
 function gameTick(gameState, gridElement, messageElement) {
 
     gameState = moveSnake(gameState, gridElement, messageElement);
+    spawnFruitRandom(gameState.grid, gameState.size, 60, 5, 5);
     updateGridElements(gameState, gridElement);
 
     if (gameState.ended) {
         return;
     }
 
-    sleep(250).then(() => { gameTick(gameState, gridElement, messageElement) });
+    sleep(200).then(() => { gameTick(gameState, gridElement, messageElement) });
 }
 
 function moveSnake(gameState, gridElement, messageElement) {
