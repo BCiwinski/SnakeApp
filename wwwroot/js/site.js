@@ -212,7 +212,12 @@ function moveSnake(gameState, gridElement, messageElement) {
     const newHeadPos = getPositionInDirection(gameState.snake.head, Direction);
 
     if (isOutsideTheBoard(newHeadPos, gameState.size)) {
-        endGame(gameState, messageElement);
+        endGame(gameState, messageElement, "Snake hit his head :(");
+        return gameState;
+    }
+
+    if (isOnSnake(newHeadPos, gameState) && !posAreEqual(newHeadPos, gameState.snake.end)) {
+        endGame(gameState, messageElement, "Snake bit his tail :(");
         return gameState;
     }
 
@@ -280,10 +285,30 @@ function isOutsideTheBoard(pos, size) {
     return false;
 }
 
-function endGame(gameState, messageElement) {
+function isOnSnake(pos, gameState) {
+
+    return gameState.grid[pos[0]][pos[1]] == SNAKE;
+}
+
+function posAreEqual(pos1, pos2) {
+
+    if (pos1[0] != pos2[0]) {
+
+        return false;
+    }
+
+    if (pos1[1] != pos2[1]) {
+
+        return false;
+    }
+
+    return true;
+}
+
+function endGame(gameState, messageElement, message) {
 
     gameState.ended = true;
-    messageElement.innerText = "Snake hit his head :(";
+    messageElement.innerText = message;
 
     GameInProgess = false;
 }
