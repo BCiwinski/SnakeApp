@@ -113,7 +113,7 @@ function updateGridElements(gameState, gridElement) {
 
         for (let j = 0; j < gameState.size; j++) {
 
-            const element = getTile(gridElement, gameState.size, [i, j]);
+            const element = getTile(gridElement, gameState.size, {x : i, y : j});
 
             for (let obj in GameObjToAttr) {
 
@@ -152,7 +152,7 @@ function generateSnake(grid, sizeNumber) {
     grid[0][0] = SNAKE;
     grid[0][1] = HEAD
 
-    return { head: [0, 1], body: [[0, 0]], end: [0, 0]};
+    return { head: { x: 0, y: 1 }, body: [{ x: 0, y: 0 }], end: { x: 0, y: 0 } };
 }
 
 /*A function for spawning a fruit on the grid
@@ -191,7 +191,7 @@ function spawnFruitRandom(grid, sizeNumber, chanceInvertedNumber, positionTriesN
 //pos - position - 2 value int array, so: pos[0] - x, pos[1] - y
 function getTile(gridElement, sizeNumber, pos) {
 
-    return gridElement.childNodes[pos[0] + pos[1] * sizeNumber];
+    return gridElement.childNodes[pos.x + pos.y * sizeNumber];
 }
 
 function gameTick(gameState, gridElement, messageElement) {
@@ -214,7 +214,7 @@ function moveSnake(gameState, gridElement, messageElement) {
         return gameState;
     }
 
-    const oldHeadPos = Array.from(gameState.snake.head);
+    const oldHeadPos = {...gameState.snake.head };
     const newHeadPos = getPositionInDirection(gameState.snake.head, Direction);
 
     if (isOutsideTheBoard(newHeadPos, gameState.size)) {
@@ -230,45 +230,45 @@ function moveSnake(gameState, gridElement, messageElement) {
     gameState.snake.body.push(oldHeadPos);
 
     //see if snake's head will be on a tile containing fruit
-    if (gameState.grid[newHeadPos[0]][newHeadPos[1]] == FRUIT) {
+    if (gameState.grid[newHeadPos.x][newHeadPos.y] == FRUIT) {
 
         //add score
     }
     else {
 
         //if snake wont be eating a frunt, move his end (remove one part)
-        gameState.grid[gameState.snake.end[0]][gameState.snake.end[1]] = EMPTY;
+        gameState.grid[gameState.snake.end.x][gameState.snake.end.y] = EMPTY;
         gameState.snake.body.shift();
         gameState.snake.end = gameState.snake.body[0];
     }
 
     //move snake's head
     gameState.snake.head = newHeadPos;
-    gameState.grid[newHeadPos[0]][newHeadPos[1]] = HEAD;
+    gameState.grid[newHeadPos.x][newHeadPos.y] = HEAD;
 
     //part of his body follows where his head was
-    gameState.grid[oldHeadPos[0]][oldHeadPos[1]] = SNAKE;
+    gameState.grid[oldHeadPos.x][oldHeadPos.y] = SNAKE;
 
     return gameState;
 }
 
 function getPositionInDirection(pos, direction) {
 
-    newPos = Array.from(pos);
+    newPos = {...pos};
 
     switch (direction) {
 
         case DOWN:
-            newPos[1] += 1;
+            newPos.y += 1;
             break;
         case UP:
-            newPos[1] -= 1;
+            newPos.y -= 1;
             break;
         case RIGHT:
-            newPos[0] += 1;
+            newPos.x += 1;
             break;
         case LEFT:
-            newPos[0] -= 1;
+            newPos.x -= 1;
     }
 
     return newPos;
@@ -276,16 +276,16 @@ function getPositionInDirection(pos, direction) {
 
 function isOutsideTheBoard(pos, size) {
 
-    if (pos[0] < 0)
+    if (pos.x < 0)
         return true;
 
-    if (pos[1] < 0)
+    if (pos.y < 0)
         return true;
 
-    if (pos[0] >= size)
+    if (pos.x >= size)
         return true;
 
-    if (pos[1] >= size)
+    if (pos.y >= size)
         return true;
 
     return false;
@@ -293,7 +293,7 @@ function isOutsideTheBoard(pos, size) {
 
 function isOnSnake(pos, gameState) {
 
-    return gameState.grid[pos[0]][pos[1]] == SNAKE;
+    return gameState.grid[pos.x][pos.y] == SNAKE;
 }
 
 function isWon(gameState) {
@@ -316,12 +316,12 @@ function isWon(gameState) {
 
 function posAreEqual(pos1, pos2) {
 
-    if (pos1[0] != pos2[0]) {
+    if (pos1.x != pos2.x) {
 
         return false;
     }
 
-    if (pos1[1] != pos2[1]) {
+    if (pos1.y != pos2.y) {
 
         return false;
     }
