@@ -334,6 +334,7 @@ function endGame(gameState, messageElement, message) {
     gameState.ended = true;
     messageElement.innerText = message;
 
+    Direction = DOWN;
     GameInProgess = false;
 }
 
