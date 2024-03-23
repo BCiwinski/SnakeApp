@@ -188,7 +188,7 @@ function spawnFruitRandom(grid, sizeNumber, chanceInvertedNumber, positionTriesN
     }
 }
 
-//pos - position - 2 value int array, so: pos[0] - x, pos[1] - y
+//pos - position - {x: int, y: int}
 function getTile(gridElement, sizeNumber, pos) {
 
     return gridElement.childNodes[pos.x + pos.y * sizeNumber];
