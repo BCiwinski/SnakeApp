@@ -1,7 +1,11 @@
+using SnakeApp.Model;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.Configure<GamemodeOptions>(builder.Configuration.GetSection("Gamemodes"));
 
 var app = builder.Build();
 
