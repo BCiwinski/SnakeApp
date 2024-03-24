@@ -70,17 +70,17 @@ $(window.addEventListener('keydown', function (e) {
             GameState = prepareGame($('#game-grid')[0], GameMode.Size);
         }
 
-        startGame($('#game-grid')[0], 10, $('#game-message')[0]);
+        startGame($('#game-grid')[0], 10, $('#game-message')[0], GameMode);
     }
 
 }, false))
 
-function startGame(gridElement, sizeNumber, messageElement) {
+function startGame(gridElement, sizeNumber, messageElement, gameMode) {
 
     GameInProgess = true;
     messageElement.innerText = "It's snake o'Clock!";
 
-    sleep(1000).then(() => { gameTick(GameState, gridElement, messageElement, 200) });
+    sleep(1000).then(() => { gameTick(GameState, gridElement, messageElement, gameMode.TickMiliseconds) });
 }
 
 function prepareGame(gridElement, sizeNumber) {

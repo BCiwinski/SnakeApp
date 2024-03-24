@@ -13,4 +13,6 @@ public class Gamemode
     public int FruitSpawnPositionTries { get; set; }
 
     public int FruitSpawnNumber { get; set; }
+
+    public int TickMiliseconds { get; set; }
 }
