@@ -1,4 +1,5 @@
 ﻿@page
+@using SnakeApp.Model
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -7,6 +8,12 @@
 <div class="text-center">
     <h1 class="display-4">Snake game</h1>
     <p>Move with WASD</p>
+    <aside>
+        @foreach(Gamemode gamemode in Model.Gamemodes)
+        {
+            <button type="button" title="@gamemode.Description" class="gamemode-button" value="@gamemode.Name"><h2>@gamemode.Name</h2></button><br/>
+        }
+    </aside>
     <div id="game">
         <div id="game-grid"></div>
     </div>

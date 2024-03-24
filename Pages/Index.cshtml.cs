@@ -9,12 +9,12 @@ namespace SnakeApp.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
-        private readonly GamemodeOptions _gamemodes;
-
+        public readonly GamemodeOptions Gamemodes;
+        
         public IndexModel(ILogger<IndexModel> logger, IOptionsSnapshot<GamemodeOptions> gamemodeOptions)
         {
             _logger = logger;
-            _gamemodes = gamemodeOptions.Value;
+            Gamemodes = gamemodeOptions.Value;
         }
 
         public void OnGet()
