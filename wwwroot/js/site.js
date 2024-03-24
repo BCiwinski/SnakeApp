@@ -21,9 +21,26 @@ const GameObjToAttr =
 
 var Direction = DOWN;
 var GameInProgess = false;
+var GameState;
+var GameMode;
 
 $(function () {
-    prepareGame($('#game-grid')[0], 10);
+    GameMode = JSON.parse($(".gamemode-button")[0].value);
+    GameState = prepareGame($('#game-grid')[0], GameMode.Size);
+
+    $(".gamemode-button").each(function (index, element) {
+
+        this.addEventListener('click', function (e) {
+
+            if (GameInProgess) {
+                return;
+            }
+
+            GameMode = JSON.parse(element.value);
+
+            GameState = prepareGame($('#game-grid')[0], GameMode.Size);
+        })
+    })
 })
 
 $(window.addEventListener('keydown', function (e) {
@@ -48,6 +65,11 @@ $(window.addEventListener('keydown', function (e) {
 
     if ((e.key == 's' || 'a' || 's' || 'd') && !GameInProgess) {
 
+        if (GameState.ended) {
+
+            GameState = prepareGame($('#game-grid')[0], GameMode.Size);
+        }
+
         startGame($('#game-grid')[0], 10, $('#game-message')[0]);
     }
 
@@ -56,9 +78,9 @@ $(window.addEventListener('keydown', function (e) {
 function startGame(gridElement, sizeNumber, messageElement) {
 
     GameInProgess = true;
-    let gameState = prepareGame(gridElement, sizeNumber);
+    messageElement.innerText = "It's snake o'Clock!";
 
-    sleep(1000).then(() => { gameTick(gameState, gridElement, messageElement) });
+    sleep(1000).then(() => { gameTick(GameState, gridElement, messageElement, 200) });
 }
 
 function prepareGame(gridElement, sizeNumber) {
@@ -72,7 +94,7 @@ function prepareGame(gridElement, sizeNumber) {
 
     let gameState = { gridElement: gridElement, grid: grid, size: sizeNumber, snake: snake, ended: false };
 
-    spawnFruitRandom(grid, sizeNumber, 1, 1, 3);
+    spawnFruitRandom(grid, sizeNumber, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
 
     updateGridElements(gameState, gridElement);
 
@@ -194,17 +216,17 @@ function getTile(gridElement, sizeNumber, pos) {
     return gridElement.childNodes[pos.x + pos.y * sizeNumber];
 }
 
-function gameTick(gameState, gridElement, messageElement) {
+function gameTick(gameState, gridElement, messageElement, nextTickMs) {
 
     gameState = moveSnake(gameState, gridElement, messageElement);
-    spawnFruitRandom(gameState.grid, gameState.size, 60, 5, 5);
+    spawnFruitRandom(gameState.grid, gameState.size, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
     updateGridElements(gameState, gridElement);
 
     if (gameState.ended) {
         return;
     }
 
-    sleep(200).then(() => { gameTick(gameState, gridElement, messageElement) });
+    sleep(nextTickMs).then(() => { gameTick(gameState, gridElement, messageElement, nextTickMs) });
 }
 
 function moveSnake(gameState, gridElement, messageElement) {
