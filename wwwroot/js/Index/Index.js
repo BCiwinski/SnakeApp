@@ -83,7 +83,9 @@ function startGame(gridElement, sizeNumber, messageElement, gameMode) {
     GameInProgess = true;
     messageElement.innerText = "It's snake o'Clock!";
 
-    sleep(1000).then(() => { gameTick(GameState, gridElement, messageElement, gameMode.TickMiliseconds) });
+    //start the game main loop by calling first gameTick()
+    //delay first tick a bit
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() => { gameTick(GameState, gridElement, messageElement, gameMode.TickMiliseconds) });
 }
 
 function prepareGame(gridElement, sizeNumber) {
@@ -228,7 +230,7 @@ function getTile(gridElement, sizeNumber, position) {
 }
 
 //main game loop
-function gameTick(gameState, gridElement, messageElement, nextTickMs) {
+function gameTick(gameState, gridElement, messageElement, delayMs) {
 
     gameState = progressGameState(gameState, gridElement, messageElement);
     spawnFruitRandom(gameState.grid, gameState.size, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
@@ -238,7 +240,9 @@ function gameTick(gameState, gridElement, messageElement, nextTickMs) {
         return;
     }
 
-    sleep(nextTickMs).then(() => { gameTick(gameState, gridElement, messageElement, nextTickMs) });
+    //if the game isn't ended - call next tick
+    //delay next this given delayMs
+    return new Promise(resolve => setTimeout(resolve, delayMs)).then(() => { gameTick(gameState, gridElement, messageElement, delayMs) });
 }
 
 //function for simulating gameState progression
@@ -380,10 +384,4 @@ function endGame(gameState, messageElement, message) {
 
     Direction = DOWN;
     GameInProgess = false;
-}
-
-//used for delay between game ticks
-//TODO: remove
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
