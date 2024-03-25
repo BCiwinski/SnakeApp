@@ -12,7 +12,7 @@
     <aside>
         @foreach(Gamemode gamemode in Model.Gamemodes)
         {
-            <button type="button" title="@gamemode.Description" class="gamemode-button" value="@JsonSerializer.Serialize(gamemode)"><h2>@gamemode.Name</h2></button><br/>
+            <button type="button" title="@gamemode.Description" class="gamemode-button btn" value="@JsonSerializer.Serialize(gamemode)"><h2>@gamemode.Name</h2></button><br/>
         }
     </aside>
     <div id="game">
