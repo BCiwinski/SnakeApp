@@ -1,14 +1,25 @@
 ﻿@page
+@using SnakeApp.Model
+@using System.Text.Json
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Snake game - work in progress</h1>
+    <h1 class="display-4">Snake game</h1>
     <p>Move with WASD</p>
+    <aside>
+        @foreach(Gamemode gamemode in Model.Gamemodes)
+        {
+            <button type="button" title="@gamemode.Description" class="gamemode-button" value="@JsonSerializer.Serialize(gamemode)"><h2>@gamemode.Name</h2></button><br/>
+        }
+    </aside>
     <div id="game">
         <div id="game-grid"></div>
     </div>
     <p id="game-message">Press one of the keys to begin.</p>
 </div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/js/Index/Index.js" asp-append-version="true"></script>

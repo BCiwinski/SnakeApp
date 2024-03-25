@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
+using SnakeApp.Model;
 
 namespace SnakeApp.Pages
 {
@@ -7,9 +9,12 @@ namespace SnakeApp.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public readonly GamemodeOptions Gamemodes;
+        
+        public IndexModel(ILogger<IndexModel> logger, IOptionsSnapshot<GamemodeOptions> gamemodeOptions)
         {
             _logger = logger;
+            Gamemodes = gamemodeOptions.Value;
         }
 
         public void OnGet()
