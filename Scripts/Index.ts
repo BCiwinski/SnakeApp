@@ -1,4 +1,6 @@
-﻿const DOWN = "down";
+﻿import Point from "Point.js";
+
+const DOWN = "down";
 const UP = "up";
 const RIGHT = "right";
 const LEFT = "left";
@@ -28,11 +30,11 @@ $(function () {
 
     //By default (on DOM load) assume first gamemode button's gamemode (it's value)
     //This should be the most basic/stadard gamemode
-    GameMode = JSON.parse($(".gamemode-button")[0].value);
+    GameMode = JSON.parse(($(".gamemode-button")[0] as HTMLInputElement).value);
     GameState = prepareGame($('#game-grid')[0], GameMode.Size);
 
     //Add event listener to all gamemode-controlling buttons for changing gamemodes
-    $(".gamemode-button").each(function (index, element) {
+    $(".gamemode-button").each(function (index: number, element : HTMLInputElement) {
 
         this.addEventListener('click', function (e) {
 
@@ -47,90 +49,91 @@ $(function () {
     })
 })
 
-$(window.addEventListener('keydown', function (e) {
+$(function () {
+    window.addEventListener("keydown", function (e) {
 
-    //Change direction-controlling var depending on user input
-    //Refuse changing the direction to the opposite - snake cant move that way
-    switch (e.key) {
-        case 's':
-            Direction = Direction == UP ? UP : DOWN;
-            break;
-        case 'w':
-            Direction = Direction == DOWN ? DOWN : UP;
-            break;
-        case 'd':
-            Direction = Direction == LEFT ? LEFT : RIGHT;
-            break;
-        case 'a':
-            Direction = Direction == RIGHT ? RIGHT : LEFT;
-            break;
-    }
-
-    if ((e.key == 's' || 'a' || 's' || 'd') && !GameInProgess) {
-
-        if (GameState.ended) {
-
-            GameState = prepareGame($('#game-grid')[0], GameMode.Size);
+        //Change direction-controlling var depending on user input
+        //Refuse changing the direction to the opposite - snake cant move that way
+        switch (e.key) {
+            case 's':
+                Direction = Direction == UP ? UP : DOWN;
+                break;
+            case 'w':
+                Direction = Direction == DOWN ? DOWN : UP;
+                break;
+            case 'd':
+                Direction = Direction == LEFT ? LEFT : RIGHT;
+                break;
+            case 'a':
+                Direction = Direction == RIGHT ? RIGHT : LEFT;
+                break;
         }
 
-        startGame($('#game-grid')[0], 10, $('#game-message')[0], GameMode);
-    }
+        if ((e.key == 's' || 'a' || 's' || 'd') && !GameInProgess) {
 
-}, false))
+            if (GameState.ended) {
 
-function startGame(gridElement, sizeNumber, messageElement, gameMode) {
+                GameState = prepareGame($('#game-grid')[0], GameMode.Size);
+            }
+
+            startGame($('#game-grid')[0], 10, $('#game-message')[0], GameMode);
+        }
+    })
+})
+
+function startGame(grid: HTMLElement, size: Number, message: HTMLElement, gameMode){
 
     GameInProgess = true;
-    messageElement.innerText = "It's snake o'Clock!";
+    message.innerText = "It's snake o'Clock!";
 
     //start the game main loop by calling first gameTick()
     //delay first tick a bit
-    return new Promise(resolve => setTimeout(resolve, 1000)).then(() => { gameTick(GameState, gridElement, messageElement, gameMode.TickMiliseconds) });
+    return new Promise<void>(resolve => setTimeout(resolve, 1000)).then(() => { gameTick(GameState, grid, message, gameMode.TickMiliseconds) });
 }
 
-function prepareGame(gridElement, sizeNumber) {
+function prepareGame(grid: HTMLElement, size: number){
 
-    clearBoard(gridElement);
-    generateBoardElements(gridElement, sizeNumber);
+    clearBoard(grid);
+    generateBoardElements(grid, size);
 
-    let grid = generateGrid(sizeNumber);
-    let snake = generateSnake(grid, sizeNumber);
-    let gameState = { gridElement: gridElement, grid: grid, size: sizeNumber, snake: snake, ended: false };
+    let gridModel = generateGrid(size);
+    let snake = generateSnake(grid, size);
+    let gameState = { gridElement: grid, grid: gridModel, size: size, snake: snake, ended: false };
 
     //Spawn some fruits before the game begins and updateGird to make the visible
-    spawnFruitRandom(grid, sizeNumber, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
-    updateGridElements(gameState, gridElement);
+    spawnFruitRandom(grid, size, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
+    updateGridElements(gameState, grid);
 
     return gameState;
 }
 
 //function for removing all tiles/squares the game takes place on
-function clearBoard(gridElement) {
+function clearBoard(grid : HTMLElement) {
 
-    while (gridElement.hasChildNodes()) {
+    while (grid.hasChildNodes()) {
 
-        gridElement.removeChild(gridElement.firstElementChild);
+        grid.removeChild(grid.firstElementChild);
     }
 }
 
 //create sizeNumber^2 elements as child nods of gridElement
-function generateBoardElements(gridElement, sizeNumber) {
+function generateBoardElements(grid : HTMLElement, size : number) {
 
     let columns = "auto";
 
-    for (let i = 1; i < sizeNumber; i++) {
+    for (let i = 1; i < size; i++) {
 
         columns += " auto";
     }
 
-    gridElement.style.gridTemplateColumns = columns;
+    grid.style.gridTemplateColumns = columns;
 
-    for (let i = 0; i < sizeNumber * sizeNumber; i++) {
+    for (let i = 0; i < size * size; i++) {
 
         let tag = document.createElement("div");
         tag.className = "square";
 
-        gridElement.appendChild(tag);
+        grid.appendChild(tag);
     }
 }
 
@@ -158,15 +161,15 @@ function updateGridElements(gameState, gridElement) {
 }
 
 //crates a 2D sizeNumber x sizeNumber int array of zeros (EMPTY)
-function generateGrid(sizeNumber) {
+function generateGrid(size: number) {
 
     let result = [];
 
-    for (let i = 0; i < sizeNumber; i++) {
+    for (let i = 0; i < size; i++) {
 
         let row = [];
 
-        for (let j = 0; j < sizeNumber; j++) {
+        for (let j = 0; j < size; j++) {
 
             row.push(EMPTY);
         }
@@ -242,7 +245,7 @@ function gameTick(gameState, gridElement, messageElement, delayMs) {
 
     //if the game isn't ended - call next tick
     //delay next this given delayMs
-    return new Promise(resolve => setTimeout(resolve, delayMs)).then(() => { gameTick(gameState, gridElement, messageElement, delayMs) });
+    return new Promise<void>(resolve => setTimeout(resolve, delayMs)).then(() => { gameTick(gameState, gridElement, messageElement, delayMs) });
 }
 
 //function for simulating gameState progression
@@ -294,9 +297,9 @@ function progressGameState(gameState, gridElement, messageElement) {
 
 //find a position {x: int, y: int} this is next to the given position in the give direction
 //where direction must be one of DOWN = "down",UP = "up",RIGHT = "right", or  LEFT = "left"
-function getPositionInDirection(position, direction) {
+function getPositionInDirection(position : Point, direction) : Point {
 
-    newPos = { ...position };
+    let newPos : Point = { ...position };
 
     switch (direction) {
 
@@ -317,7 +320,7 @@ function getPositionInDirection(position, direction) {
 }
 
 //checks whether a given position is outside a board of given size
-function isOutsideTheBoard(position, size) {
+function isOutsideTheBoard(position : Point, size: number) : boolean {
 
     if (position.x < 0)
         return true;
@@ -335,19 +338,19 @@ function isOutsideTheBoard(position, size) {
 }
 
 //checks whether any snake's segement occupies given position
-function isOnSnake(position, gameState) {
+function isOnSnake(position : Point, gameState) : boolean {
 
     return gameState.grid[position.x][position.y] == SNAKE;
 }
 
 //checks if a given gameState satisfies conditions for victory
-function isWon(gameState) {
+function isWon(gameState) : boolean {
 
     for (let i = 0; i < gameState.size; i++) {
 
         for (let j = 0; j < gameState.size; j++) {
 
-            tile = gameState.grid[i][j]
+            let tile = gameState.grid[i][j]
 
             if (tile == EMPTY || tile == FRUIT) {
 
@@ -360,14 +363,14 @@ function isWon(gameState) {
 }
 
 //checks if two given positions have the same value
-function posAreEqual(position1, position2) {
+function posAreEqual(first : Point, second : Point) : boolean {
 
-    if (position1.x != position2.x) {
+    if (first.x != second.x) {
 
         return false;
     }
 
-    if (position1.y != position2.y) {
+    if (first.y != second.y) {
 
         return false;
     }
@@ -377,7 +380,7 @@ function posAreEqual(position1, position2) {
 
 //marks the game (gameState) as ended, sets the message in messageElement
 //resets necassary variables to allow for preparing of the next game
-function endGame(gameState, messageElement, message) {
+function endGame(gameState, messageElement, message) : void {
 
     gameState.ended = true;
     messageElement.innerText = message;
