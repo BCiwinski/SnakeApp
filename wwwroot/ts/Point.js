@@ -34,4 +34,12 @@ export class Snake {
         grid.setTile(1, this.head);
     }
 }
+export class State {
+    constructor(element, grid, snake) {
+        this.ended = false;
+        this.element = element;
+        this.grid = grid;
+        this.snake = snake;
+    }
+}
 //# sourceMappingURL=Point.js.map

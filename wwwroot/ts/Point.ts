@@ -68,3 +68,21 @@ export class Snake {
         grid.setTile(1, this.head);
     }
 }
+
+export class State {
+
+    element: HTMLElement
+
+    grid: Grid
+
+    snake: Snake
+
+    ended: boolean = false;
+
+    constructor(element: HTMLElement, grid: Grid, snake: Snake) {
+
+        this.element = element;
+        this.grid = grid;
+        this.snake = snake;
+    }
+}

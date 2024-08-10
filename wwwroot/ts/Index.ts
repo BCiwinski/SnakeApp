@@ -1,4 +1,4 @@
-﻿import {Point, Grid, Snake, Direction} from "./Point.js";
+﻿import {Point, Grid, Snake, State, Direction} from "./Point.js";
 
 const HEAD_ATTR = "head";
 const SNAKE_ATTR = "snake";
@@ -9,16 +9,21 @@ const HEAD = 1;
 const SNAKE = 2;
 const FRUIT = 3;
 
-const GameObjToAttr =
-{
-    1: HEAD_ATTR,
-    2: SNAKE_ATTR,
-    3: FRUIT_ATTR
-}
+const GameObjToAttr = new Map;
+GameObjToAttr.set(1, HEAD_ATTR);
+GameObjToAttr.set(2, SNAKE_ATTR);
+GameObjToAttr.set(3, FRUIT_ATTR);
+
+//const GameObjToAttr =
+//{
+//    1: HEAD_ATTR,
+//    2: SNAKE_ATTR,
+//    3: FRUIT_ATTR
+//}
 
 var Current: Direction = "down";
 var GameInProgess = false;
-var GameState;
+var GameState: State;
 var GameMode;
 
 $(function () {
@@ -86,14 +91,14 @@ function startGame(grid: HTMLElement, size: Number, message: HTMLElement, gameMo
     new Promise<void>(resolve => setTimeout(resolve, 1000)).then(() => { gameTick(GameState, grid, message, gameMode.TickMiliseconds) });
 }
 
-function prepareGame(grid: HTMLElement, size: number){
+function prepareGame(grid: HTMLElement, size: number) : State{
 
     clearBoard(grid);
     generateBoardElements(grid, size);
 
     let gridModel: Grid = new Grid(size);
-    let snake : Snake = new Snake(gridModel);
-    let gameState = { gridElement: grid, grid: gridModel, size: size, snake: snake, ended: false };
+    let snake: Snake = new Snake(gridModel);
+    let gameState = new State(grid, gridModel, snake);
 
     //Spawn some fruits before the game begins and updateGird to make the visible
     spawnFruitRandom(gridModel, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
@@ -103,7 +108,7 @@ function prepareGame(grid: HTMLElement, size: number){
 }
 
 //function for removing all tiles/squares the game takes place on
-function clearBoard(grid : HTMLElement) {
+function clearBoard(grid : HTMLElement) : void {
 
     while (grid.hasChildNodes()) {
 
@@ -112,7 +117,7 @@ function clearBoard(grid : HTMLElement) {
 }
 
 //create sizeNumber^2 elements as child nods of gridElement
-function generateBoardElements(grid : HTMLElement, size : number) {
+function generateBoardElements(grid : HTMLElement, size : number) : void {
 
     let columns = "auto";
 
@@ -134,21 +139,21 @@ function generateBoardElements(grid : HTMLElement, size : number) {
 
 //main function for "rendering" the game
 //adds and removes attributes of gridElement's child elements to reflect given gameState
-function updateGridElements(gameState, gridElement) {
+function updateGridElements(gameState : State, grid : HTMLElement) {
 
-    for (let i = 0; i < gameState.size; i++) {
+    for (let i = 0; i < gameState.grid.size; i++) {
 
-        for (let j = 0; j < gameState.size; j++) {
+        for (let j = 0; j < gameState.grid.size; j++) {
 
-            const element = getTile(gridElement, gameState.size, { x: i, y: j });
+            const element = getTile(grid, gameState.grid.size, { x: i, y: j });
 
-            for (let obj in GameObjToAttr) {
+            for (let [obj, attr] of GameObjToAttr) {
 
-                element.removeAttribute(GameObjToAttr[obj]);
+                element.removeAttribute(attr);
 
                 if (gameState.grid.getTile(new Point(i, j)) == obj) {
 
-                    element.setAttribute(GameObjToAttr[obj], "");
+                    element.setAttribute(attr, "");
                 }
             }
         }
@@ -163,17 +168,17 @@ chanceInvertedNumber - inverted chance to spawn a fruit with one run - int
 positionTriesNumber - number of tries to find an empty spot - int
 spawnTriesNumber - number of runs of the whole func - int
 */
-function spawnFruitRandom(grid : Grid, chanceInvertedNumber, positionTriesNumber, spawnTriesNumber) {
+function spawnFruitRandom(grid : Grid, chanceInverted : number, positionTries : number, spawnTries : number) : void {
 
-    for (let i = 0; i < spawnTriesNumber; i++) {
+    for (let i = 0; i < spawnTries; i++) {
 
-        let rand = Math.random() * chanceInvertedNumber;
+        let rand = Math.random() * chanceInverted;
 
         if (rand > 1.0) {
             continue;
         }
 
-        for (let j = 0; j < positionTriesNumber; j++) {
+        for (let j = 0; j < positionTries; j++) {
 
             let rand_x = Math.round(Math.random() * (grid.size - 1));
             let rand_y = Math.round(Math.random() * (grid.size - 1));
@@ -192,72 +197,72 @@ function spawnFruitRandom(grid : Grid, chanceInvertedNumber, positionTriesNumber
 
 //retrive a tile/square element at position x - right, y - down
 //position is {x: int, y: int}
-function getTile(gridElement, size : number, position) {
+function getTile(grid : HTMLElement, size : number, position) : HTMLElement {
 
-    return gridElement.childNodes[position.x + position.y * size];
+    return grid.childNodes[position.x + position.y * size] as HTMLElement;
 }
 
 //main game loop
-function gameTick(gameState, grid : HTMLElement, message : HTMLElement, delayMs : number) : void {
+function gameTick(game : State, grid : HTMLElement, message : HTMLElement, delayMs : number) : void {
 
-    gameState = progressGameState(gameState, grid, message);
-    spawnFruitRandom(gameState.grid, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
-    updateGridElements(gameState, grid);
+    game = progressGameState(game, message);
+    spawnFruitRandom(game.grid, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
+    updateGridElements(game, grid);
 
-    if (gameState.ended) {
+    if (game.ended) {
         return;
     }
 
     //if the game isn't ended - call next tick
     //delay next this given delayMs
-    new Promise<void>(resolve => setTimeout(resolve, delayMs)).then(() => { gameTick(gameState, grid, message, delayMs) });
+    new Promise<void>(resolve => setTimeout(resolve, delayMs)).then(() => { gameTick(game, grid, message, delayMs) });
 }
 
 //function for simulating gameState progression
 //also checks if current gameState statisfies conditions for either loss or win
-function progressGameState(gameState, gridElement, message : HTMLElement) {
+function progressGameState(game : State, message : HTMLElement) : State {
 
-    if (isWon(gameState)) {
-        endGame(gameState, message, "Snake won!");
-        return gameState;
+    if (isWon(game)) {
+        endGame(game, message, "Snake won!");
+        return game;
     }
 
-    const oldHeadPos: Point = new Point(gameState.snake.head.x, gameState.snake.head.y);
-    const newHeadPos : Point = getPositionInDirection(gameState.snake.head, Current);
+    const oldHeadPos: Point = new Point(game.snake.head.x, game.snake.head.y);
+    const newHeadPos : Point = getPositionInDirection(game.snake.head, Current);
 
-    if (isOutsideTheBoard(newHeadPos, gameState.size)) {
-        endGame(gameState, message, "Snake hit his head :(");
-        return gameState;
+    if (isOutsideTheBoard(newHeadPos, game.grid.size)) {
+        endGame(game, message, "Snake hit his head :(");
+        return game;
     }
 
-    if (isOnSnake(newHeadPos, gameState) && !posAreEqual(newHeadPos, gameState.snake.end)) {
-        endGame(gameState, message, "Snake bit his tail :(");
-        return gameState;
+    if (isOnSnake(newHeadPos, game) && !posAreEqual(newHeadPos, game.snake.end)) {
+        endGame(game, message, "Snake bit his tail :(");
+        return game;
     }
 
-    gameState.snake.body.push(oldHeadPos);
+    game.snake.body.push(oldHeadPos);
 
     //see if snake's head will be on a tile containing fruit
-    if (gameState.grid.getTile(newHeadPos) == FRUIT) {
+    if (game.grid.getTile(newHeadPos) == FRUIT) {
 
         //add score
     }
     else {
 
         //if snake wont be eating a frunt, move his end (remove one part)
-        gameState.grid.setTile(EMPTY, gameState.snake.end);
-        gameState.snake.body.shift();
-        gameState.snake.end = gameState.snake.body[0];
+        game.grid.setTile(EMPTY, game.snake.end);
+        game.snake.body.shift();
+        game.snake.end = game.snake.body[0];
     }
 
     //move snake's head
-    gameState.snake.head = newHeadPos;
-    gameState.grid.setTile(HEAD, newHeadPos);
+    game.snake.head = newHeadPos;
+    game.grid.setTile(HEAD, newHeadPos);
 
     //part of his body follows where his head was
-    gameState.grid.setTile(SNAKE, oldHeadPos);
+    game.grid.setTile(SNAKE, oldHeadPos);
 
-    return gameState;
+    return game;
 }
 
 //find a position {x: int, y: int} this is next to the given position in the give direction
@@ -303,19 +308,19 @@ function isOutsideTheBoard(position : Point, size: number) : boolean {
 }
 
 //checks whether any snake's segement occupies given position
-function isOnSnake(position : Point, gameState) : boolean {
+function isOnSnake(position : Point, game : State) : boolean {
 
-    return gameState.grid.getTile(position) == SNAKE;
+    return game.grid.getTile(position) == SNAKE;
 }
 
 //checks if a given gameState satisfies conditions for victory
-function isWon(gameState) : boolean {
+function isWon(game : State) : boolean {
 
-    for (let i = 0; i < gameState.size; i++) {
+    for (let i = 0; i < game.grid.size; i++) {
+        
+        for (let j = 0; j < game.grid.size; j++) {
 
-        for (let j = 0; j < gameState.size; j++) {
-
-            let tile = gameState.grid.getTile(new Point(i, j));
+            let tile = game.grid.getTile(new Point(i, j));
 
             if (tile == EMPTY || tile == FRUIT) {
 
@@ -345,9 +350,9 @@ function posAreEqual(first : Point, second : Point) : boolean {
 
 //marks the game (gameState) as ended, sets the message in messageElement
 //resets necassary variables to allow for preparing of the next game
-function endGame(gameState, message :HTMLElement, text : string) : void {
+function endGame(game, message :HTMLElement, text : string) : void {
 
-    gameState.ended = true;
+    game.ended = true;
     message.innerText = text;
 
     Current = "down";
