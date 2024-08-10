@@ -1,4 +1,4 @@
-import { Point, Grid, Snake, State } from "./Point.js";
+import { Point, Grid, Snake, State, Mode } from "./Point.js";
 const HEAD_ATTR = "head";
 const SNAKE_ATTR = "snake";
 const FRUIT_ATTR = "fruit";
@@ -24,7 +24,7 @@ $(function () {
     //By default (on DOM load) assume first gamemode button's gamemode (it's value)
     //This should be the most basic/stadard gamemode
     GameMode = JSON.parse($(".gamemode-button")[0].value);
-    GameState = prepareGame($('#game-grid')[0], GameMode.Size);
+    GameState = prepareGame($('#game-grid')[0], GameMode.size);
     //Add event listener to all gamemode-controlling buttons for changing gamemodes
     $(".gamemode-button").each(function (index, element) {
         this.addEventListener('click', function (e) {
@@ -32,8 +32,9 @@ $(function () {
             if (GameInProgess) {
                 return;
             }
-            GameMode = JSON.parse(element.value);
-            GameState = prepareGame($('#game-grid')[0], GameMode.Size);
+            let parsed = JSON.parse(element.value);
+            GameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.TickMiliseconds);
+            GameState = prepareGame($('#game-grid')[0], GameMode.size);
         });
     });
 });
@@ -57,7 +58,7 @@ $(function () {
         }
         if ((e.key == 's' || 'a' || 's' || 'd') && !GameInProgess) {
             if (GameState.ended) {
-                GameState = prepareGame($('#game-grid')[0], GameMode.Size);
+                GameState = prepareGame($('#game-grid')[0], GameMode.size);
             }
             startGame($('#game-grid')[0], 10, $('#game-message')[0], GameMode);
         }
@@ -77,7 +78,7 @@ function prepareGame(grid, size) {
     let snake = new Snake(gridModel);
     let gameState = new State(grid, gridModel, snake);
     //Spawn some fruits before the game begins and updateGird to make the visible
-    spawnFruitRandom(gridModel, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
+    spawnFruitRandom(gridModel, GameMode.fruitSpawnChance, GameMode.fruitSpawnPositionTries, GameMode.fruitSpawnNumber);
     updateGridElements(gameState, grid);
     return gameState;
 }
@@ -148,7 +149,7 @@ function getTile(grid, size, position) {
 //main game loop
 function gameTick(game, grid, message, delayMs) {
     game = progressGameState(game, message);
-    spawnFruitRandom(game.grid, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
+    spawnFruitRandom(game.grid, GameMode.fruitSpawnChance, GameMode.fruitSpawnPositionTries, GameMode.fruitSpawnNumber);
     updateGridElements(game, grid);
     if (game.ended) {
         return;

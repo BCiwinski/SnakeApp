@@ -56,4 +56,15 @@ export class State {
         return this.grid.getTile(position) == 2;
     }
 }
+export class Mode {
+    constructor(name, description, size, fruitSpawnChance, fruitSpawnPositionTries, fruitSpawnNumber, tickMiliseconds) {
+        this.name = name;
+        this.description = description;
+        this.size = size;
+        this.fruitSpawnChance = fruitSpawnChance;
+        this.fruitSpawnPositionTries = fruitSpawnPositionTries;
+        this.fruitSpawnNumber = fruitSpawnNumber;
+        this.tickMiliseconds = tickMiliseconds;
+    }
+}
 //# sourceMappingURL=Point.js.map

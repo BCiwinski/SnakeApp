@@ -108,3 +108,37 @@ export class State {
         return this.grid.getTile(position) == 2;
     }
 }
+
+export class Mode {
+
+    name: string
+
+    description: string
+
+    size: number
+
+    fruitSpawnChance: number
+
+    fruitSpawnPositionTries: number
+
+    fruitSpawnNumber: number
+
+    tickMiliseconds: number
+
+    constructor(name: string,
+        description: string,
+        size: number,
+        fruitSpawnChance: number,
+        fruitSpawnPositionTries: number,
+        fruitSpawnNumber: number,
+        tickMiliseconds: number) {
+
+        this.name = name;
+        this.description = description;
+        this.size = size;
+        this.fruitSpawnChance = fruitSpawnChance;
+        this.fruitSpawnPositionTries = fruitSpawnPositionTries;
+        this.fruitSpawnNumber = fruitSpawnNumber;
+        this.tickMiliseconds = tickMiliseconds;
+    }
+}
