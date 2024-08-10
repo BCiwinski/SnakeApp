@@ -1,4 +1,4 @@
-﻿import {Point, Grid} from "./Point.js";
+﻿import {Point, Grid, Snake} from "./Point.js";
 
 const DOWN = "down";
 const UP = "up";
@@ -97,7 +97,7 @@ function prepareGame(grid: HTMLElement, size: number){
     generateBoardElements(grid, size);
 
     let gridModel: Grid = new Grid(size);
-    let snake = generateSnake(gridModel, size);
+    let snake = new Snake(gridModel);
     let gameState = { gridElement: grid, grid: gridModel, size: size, snake: snake, ended: false };
 
     //Spawn some fruits before the game begins and updateGird to make the visible
@@ -158,17 +158,6 @@ function updateGridElements(gameState, gridElement) {
             }
         }
     }
-}
-
-function generateSnake(grid : Grid, sizeNumber) {
-
-    let body: Point = new Point(0, 0);
-    let head: Point = new Point(0, 1);
-
-    grid.setTile(SNAKE, body);
-    grid.setTile(HEAD, head);
-
-    return { head: head, body: [body], end: body };
 }
 
 /*A function for spawning a fruit on the grid

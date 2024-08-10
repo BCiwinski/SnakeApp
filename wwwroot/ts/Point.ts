@@ -44,3 +44,25 @@ export class Grid{
     }
 }
 
+export class Snake {
+
+    grid: Grid
+
+    head: Point;
+    end: Point;
+
+    body: Array<Point>
+
+    constructor(grid : Grid) {
+
+        this.grid = grid;
+        this.body = new Array<Point>;
+
+        this.end = new Point(0, 0);
+        this.body.push(this.end);
+        this.head = new Point(0, 1);
+
+        this.body.forEach(function (value: Point) { grid.setTile(2, value) })
+        grid.setTile(1, this.head);
+    }
+}
