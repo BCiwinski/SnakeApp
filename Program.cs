@@ -21,11 +21,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseDefaultFiles();
-app.UseStaticFiles(new StaticFileOptions()
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Scripts")),
-    RequestPath = new PathString("/Static")
-});
+app.UseStaticFiles();
 
 app.UseRouting();
 

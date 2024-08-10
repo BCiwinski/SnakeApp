@@ -7,14 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\lib\**" />
-    <Content Remove="wwwroot\lib\**" />
-    <EmbeddedResource Remove="wwwroot\lib\**" />
-    <None Remove="wwwroot\lib\**" />
-    <TypeScriptCompile Remove="wwwroot\lib\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.5.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,6 +15,13 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\js\Index\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\ts\Index.js" />
+    <None Include="wwwroot\ts\Index.js.map" />
+    <None Include="wwwroot\ts\Point.js" />
+    <None Include="wwwroot\ts\Point.js.map" />
   </ItemGroup>
 
 </Project>
