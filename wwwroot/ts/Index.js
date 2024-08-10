@@ -10,12 +10,6 @@ const GameObjToAttr = new Map;
 GameObjToAttr.set(1, HEAD_ATTR);
 GameObjToAttr.set(2, SNAKE_ATTR);
 GameObjToAttr.set(3, FRUIT_ATTR);
-//const GameObjToAttr =
-//{
-//    1: HEAD_ATTR,
-//    2: SNAKE_ATTR,
-//    3: FRUIT_ATTR
-//}
 var Current = "down";
 var GameInProgess = false;
 var GameState;
@@ -23,7 +17,8 @@ var GameMode;
 $(function () {
     //By default (on DOM load) assume first gamemode button's gamemode (it's value)
     //This should be the most basic/stadard gamemode
-    GameMode = JSON.parse($(".gamemode-button")[0].value);
+    let parsed = JSON.parse($(".gamemode-button")[0].value);
+    GameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.TickMiliseconds);
     GameState = prepareGame($('#game-grid')[0], GameMode.size);
     //Add event listener to all gamemode-controlling buttons for changing gamemodes
     $(".gamemode-button").each(function (index, element) {
@@ -69,7 +64,7 @@ function startGame(grid, size, message, gameMode) {
     message.innerText = "It's snake o'Clock!";
     //start the game main loop by calling first gameTick()
     //delay first tick a bit
-    new Promise(resolve => setTimeout(resolve, 1000)).then(() => { gameTick(GameState, grid, message, gameMode.TickMiliseconds); });
+    new Promise(resolve => setTimeout(resolve, 1000)).then(() => { gameTick(GameState, grid, message, gameMode.tickMiliseconds); });
 }
 function prepareGame(grid, size) {
     clearBoard(grid);
