@@ -1,8 +1,4 @@
 import { Point, Grid, Snake } from "./Point.js";
-const DOWN = "down";
-const UP = "up";
-const RIGHT = "right";
-const LEFT = "left";
 const HEAD_ATTR = "head";
 const SNAKE_ATTR = "snake";
 const FRUIT_ATTR = "fruit";
@@ -15,7 +11,7 @@ const GameObjToAttr = {
     2: SNAKE_ATTR,
     3: FRUIT_ATTR
 };
-var Direction = DOWN;
+var Current = "down";
 var GameInProgess = false;
 var GameState;
 var GameMode;
@@ -42,16 +38,16 @@ $(function () {
         //Refuse changing the direction to the opposite - snake cant move that way
         switch (e.key) {
             case 's':
-                Direction = Direction == UP ? UP : DOWN;
+                Current = Current == "up" ? "up" : "down";
                 break;
             case 'w':
-                Direction = Direction == DOWN ? DOWN : UP;
+                Current = Current == "down" ? "down" : "up";
                 break;
             case 'd':
-                Direction = Direction == LEFT ? LEFT : RIGHT;
+                Current = Current == "left" ? "left" : "right";
                 break;
             case 'a':
-                Direction = Direction == RIGHT ? RIGHT : LEFT;
+                Current = Current == "right" ? "right" : "left";
                 break;
         }
         if ((e.key == 's' || 'a' || 's' || 'd') && !GameInProgess) {
@@ -164,7 +160,7 @@ function progressGameState(gameState, gridElement, message) {
         return gameState;
     }
     const oldHeadPos = new Point(gameState.snake.head.x, gameState.snake.head.y);
-    const newHeadPos = getPositionInDirection(gameState.snake.head, Direction);
+    const newHeadPos = getPositionInDirection(gameState.snake.head, Current);
     if (isOutsideTheBoard(newHeadPos, gameState.size)) {
         endGame(gameState, message, "Snake hit his head :(");
         return gameState;
@@ -196,16 +192,16 @@ function progressGameState(gameState, gridElement, message) {
 function getPositionInDirection(position, direction) {
     let newPos = Object.assign({}, position);
     switch (direction) {
-        case DOWN:
+        case "down":
             newPos.y += 1;
             break;
-        case UP:
+        case "up":
             newPos.y -= 1;
             break;
-        case RIGHT:
+        case "right":
             newPos.x += 1;
             break;
-        case LEFT:
+        case "left":
             newPos.x -= 1;
     }
     return newPos;
@@ -253,7 +249,7 @@ function posAreEqual(first, second) {
 function endGame(gameState, message, text) {
     gameState.ended = true;
     message.innerText = text;
-    Direction = DOWN;
+    Current = "down";
     GameInProgess = false;
 }
 //# sourceMappingURL=Index.js.map

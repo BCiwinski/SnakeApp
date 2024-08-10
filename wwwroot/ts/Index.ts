@@ -1,9 +1,4 @@
-﻿import {Point, Grid, Snake} from "./Point.js";
-
-const DOWN = "down";
-const UP = "up";
-const RIGHT = "right";
-const LEFT = "left";
+﻿import {Point, Grid, Snake, Direction} from "./Point.js";
 
 const HEAD_ATTR = "head";
 const SNAKE_ATTR = "snake";
@@ -21,7 +16,7 @@ const GameObjToAttr =
     3: FRUIT_ATTR
 }
 
-var Direction = DOWN;
+var Current: Direction = "down";
 var GameInProgess = false;
 var GameState;
 var GameMode;
@@ -56,16 +51,16 @@ $(function () {
         //Refuse changing the direction to the opposite - snake cant move that way
         switch (e.key) {
             case 's':
-                Direction = Direction == UP ? UP : DOWN;
+                Current = Current == "up" ? "up" : "down";
                 break;
             case 'w':
-                Direction = Direction == DOWN ? DOWN : UP;
+                Current = Current == "down" ? "down" : "up";
                 break;
             case 'd':
-                Direction = Direction == LEFT ? LEFT : RIGHT;
+                Current = Current == "left" ? "left" : "right";
                 break;
             case 'a':
-                Direction = Direction == RIGHT ? RIGHT : LEFT;
+                Current = Current == "right" ? "right" : "left";
                 break;
         }
 
@@ -228,7 +223,7 @@ function progressGameState(gameState, gridElement, message : HTMLElement) {
     }
 
     const oldHeadPos: Point = new Point(gameState.snake.head.x, gameState.snake.head.y);
-    const newHeadPos : Point = getPositionInDirection(gameState.snake.head, Direction);
+    const newHeadPos : Point = getPositionInDirection(gameState.snake.head, Current);
 
     if (isOutsideTheBoard(newHeadPos, gameState.size)) {
         endGame(gameState, message, "Snake hit his head :(");
@@ -267,22 +262,22 @@ function progressGameState(gameState, gridElement, message : HTMLElement) {
 
 //find a position {x: int, y: int} this is next to the given position in the give direction
 //where direction must be one of DOWN = "down",UP = "up",RIGHT = "right", or  LEFT = "left"
-function getPositionInDirection(position : Point, direction) : Point {
+function getPositionInDirection(position : Point, direction : Direction) : Point {
 
     let newPos : Point = { ...position };
 
     switch (direction) {
 
-        case DOWN:
+        case "down":
             newPos.y += 1;
             break;
-        case UP:
+        case "up":
             newPos.y -= 1;
             break;
-        case RIGHT:
+        case "right":
             newPos.x += 1;
             break;
-        case LEFT:
+        case "left":
             newPos.x -= 1;
     }
 
@@ -355,6 +350,6 @@ function endGame(gameState, message :HTMLElement, text : string) : void {
     gameState.ended = true;
     message.innerText = text;
 
-    Direction = DOWN;
+    Current = "down";
     GameInProgess = false;
 }
