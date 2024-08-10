@@ -166,11 +166,11 @@ function progressGameState(game, message) {
     }
     const oldHeadPos = new Point(game.snake.head.x, game.snake.head.y);
     const newHeadPos = getPositionInDirection(game.snake.head, Current);
-    if (isOutsideTheBoard(newHeadPos, game.grid.size)) {
+    if (game.isPointOutsideTheBoard(newHeadPos)) {
         endGame(game, message, "Snake hit his head :(");
         return game;
     }
-    if (isOnSnake(newHeadPos, game) && !posAreEqual(newHeadPos, game.snake.end)) {
+    if (game.isPointOnSnake(newHeadPos) && !posAreEqual(newHeadPos, game.snake.end)) {
         endGame(game, message, "Snake bit his tail :(");
         return game;
     }
@@ -210,22 +210,6 @@ function getPositionInDirection(position, direction) {
             newPos.x -= 1;
     }
     return newPos;
-}
-//checks whether a given position is outside a board of given size
-function isOutsideTheBoard(position, size) {
-    if (position.x < 0)
-        return true;
-    if (position.y < 0)
-        return true;
-    if (position.x >= size)
-        return true;
-    if (position.y >= size)
-        return true;
-    return false;
-}
-//checks whether any snake's segement occupies given position
-function isOnSnake(position, game) {
-    return game.grid.getTile(position) == SNAKE;
 }
 //checks if a given gameState satisfies conditions for victory
 function isWon(game) {

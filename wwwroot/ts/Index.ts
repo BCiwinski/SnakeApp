@@ -230,12 +230,12 @@ function progressGameState(game : State, message : HTMLElement) : State {
     const oldHeadPos: Point = new Point(game.snake.head.x, game.snake.head.y);
     const newHeadPos : Point = getPositionInDirection(game.snake.head, Current);
 
-    if (isOutsideTheBoard(newHeadPos, game.grid.size)) {
+    if (game.isPointOutsideTheBoard(newHeadPos)) {
         endGame(game, message, "Snake hit his head :(");
         return game;
     }
 
-    if (isOnSnake(newHeadPos, game) && !posAreEqual(newHeadPos, game.snake.end)) {
+    if (game.isPointOnSnake(newHeadPos) && !posAreEqual(newHeadPos, game.snake.end)) {
         endGame(game, message, "Snake bit his tail :(");
         return game;
     }
@@ -289,30 +289,6 @@ function getPositionInDirection(position : Point, direction : Direction) : Point
     return newPos;
 }
 
-//checks whether a given position is outside a board of given size
-function isOutsideTheBoard(position : Point, size: number) : boolean {
-
-    if (position.x < 0)
-        return true;
-
-    if (position.y < 0)
-        return true;
-
-    if (position.x >= size)
-        return true;
-
-    if (position.y >= size)
-        return true;
-
-    return false;
-}
-
-//checks whether any snake's segement occupies given position
-function isOnSnake(position : Point, game : State) : boolean {
-
-    return game.grid.getTile(position) == SNAKE;
-}
-
 //checks if a given gameState satisfies conditions for victory
 function isWon(game : State) : boolean {
 
@@ -350,7 +326,7 @@ function posAreEqual(first : Point, second : Point) : boolean {
 
 //marks the game (gameState) as ended, sets the message in messageElement
 //resets necassary variables to allow for preparing of the next game
-function endGame(game, message :HTMLElement, text : string) : void {
+function endGame(game: State, message :HTMLElement, text : string) : void {
 
     game.ended = true;
     message.innerText = text;

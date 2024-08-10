@@ -41,5 +41,19 @@ export class State {
         this.grid = grid;
         this.snake = snake;
     }
+    isPointOutsideTheBoard(point) {
+        if (point.x < 0)
+            return true;
+        if (point.y < 0)
+            return true;
+        if (point.x >= this.grid.size)
+            return true;
+        if (point.y >= this.grid.size)
+            return true;
+        return false;
+    }
+    isPointOnSnake(position) {
+        return this.grid.getTile(position) == 2;
+    }
 }
 //# sourceMappingURL=Point.js.map
