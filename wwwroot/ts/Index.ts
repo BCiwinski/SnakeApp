@@ -92,11 +92,11 @@ function prepareGame(grid: HTMLElement, size: number){
     generateBoardElements(grid, size);
 
     let gridModel: Grid = new Grid(size);
-    let snake = new Snake(gridModel);
+    let snake : Snake = new Snake(gridModel);
     let gameState = { gridElement: grid, grid: gridModel, size: size, snake: snake, ended: false };
 
     //Spawn some fruits before the game begins and updateGird to make the visible
-    spawnFruitRandom(gridModel, size, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
+    spawnFruitRandom(gridModel, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
     updateGridElements(gameState, grid);
 
     return gameState;
@@ -163,7 +163,7 @@ chanceInvertedNumber - inverted chance to spawn a fruit with one run - int
 positionTriesNumber - number of tries to find an empty spot - int
 spawnTriesNumber - number of runs of the whole func - int
 */
-function spawnFruitRandom(grid : Grid, sizeNumber, chanceInvertedNumber, positionTriesNumber, spawnTriesNumber) {
+function spawnFruitRandom(grid : Grid, chanceInvertedNumber, positionTriesNumber, spawnTriesNumber) {
 
     for (let i = 0; i < spawnTriesNumber; i++) {
 
@@ -175,8 +175,8 @@ function spawnFruitRandom(grid : Grid, sizeNumber, chanceInvertedNumber, positio
 
         for (let j = 0; j < positionTriesNumber; j++) {
 
-            let rand_x = Math.round(Math.random() * (sizeNumber - 1));
-            let rand_y = Math.round(Math.random() * (sizeNumber - 1));
+            let rand_x = Math.round(Math.random() * (grid.size - 1));
+            let rand_y = Math.round(Math.random() * (grid.size - 1));
 
             let rand_point = new Point(rand_x, rand_y);
 
@@ -201,7 +201,7 @@ function getTile(gridElement, size : number, position) {
 function gameTick(gameState, grid : HTMLElement, message : HTMLElement, delayMs : number) : void {
 
     gameState = progressGameState(gameState, grid, message);
-    spawnFruitRandom(gameState.grid, gameState.size, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
+    spawnFruitRandom(gameState.grid, GameMode.FruitSpawnChance, GameMode.FruitSpawnPositionTries, GameMode.FruitSpawnNumber);
     updateGridElements(gameState, grid);
 
     if (gameState.ended) {
