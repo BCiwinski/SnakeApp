@@ -126,7 +126,6 @@ export class SnakeGame extends EventTarget {
         super();
         _SnakeGame_instances.add(this);
         this.tick = new Event("tick");
-        this.victory = new Event("victory");
         this.failure = new Event("failure");
         _SnakeGame_tick.set(this, 0);
         _SnakeGame_ended.set(this, false);
@@ -169,6 +168,7 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
     if (__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_isWon).call(this)) {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
+        this.victory = new CustomEvent("victory", { detail: new VictoryEventDetail(__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_score).call(this), this.mode.name) });
         this.dispatchEvent(this.victory);
         return;
     }
@@ -217,6 +217,12 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
     let quotient = Math.sqrt(__classPrivateFieldGet(this, _SnakeGame_tick, "f"));
     return Math.ceil((this.snake.length() * lengthMultiplier) / quotient);
 };
+export class VictoryEventDetail {
+    constructor(score, gameMode) {
+        this.score = score;
+        this.gameMode = gameMode;
+    }
+}
 export class Mode {
     constructor(name, description, size, fruitSpawnChance, fruitSpawnPositionTries, fruitSpawnNumber, tickMiliseconds) {
         this.name = name;

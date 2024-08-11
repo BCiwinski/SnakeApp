@@ -182,7 +182,7 @@ export class SnakeGame extends EventTarget {
 
     tick: Event = new Event("tick");
 
-    victory: Event = new Event("victory");
+    victory: CustomEvent;
 
     failure: Event = new Event("failure");
 
@@ -259,6 +259,8 @@ export class SnakeGame extends EventTarget {
         if (this.#isWon()) {
             this.#ended = true;
             this.#inProgress = false;
+
+            this.victory = new CustomEvent("victory", { detail: new VictoryEventDetail(this.#score(), this.mode.name) });
             this.dispatchEvent(this.victory);
             return;
         }
@@ -335,6 +337,19 @@ export class SnakeGame extends EventTarget {
         let quotient = Math.sqrt(this.#tick);
 
         return Math.ceil((this.snake.length() * lengthMultiplier) / quotient);
+    }
+}
+
+export class VictoryEventDetail {
+    
+    score: number
+
+    gameMode: string
+
+    constructor(score: number, gameMode: string) {
+
+        this.score = score;
+        this.gameMode = gameMode;
     }
 }
 

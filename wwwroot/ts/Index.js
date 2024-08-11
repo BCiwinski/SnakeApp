@@ -117,13 +117,14 @@ function finishGame() {
     Game.removeEventListener("failure", finishGame);
     $('#game-message')[0].innerHTML = "Game over";
 }
-function finishGameVictory() {
+function finishGameVictory(e) {
+    let detail = e.detail;
     GameEnded = true;
     GameInProgess = false;
     Game.removeEventListener("tick", updateGridElements);
     Game.removeEventListener("victory", finishGame);
     Game.removeEventListener("failure", finishGame);
-    $('#game-message')[0].innerHTML = "Victory!";
+    $('#game-message')[0].innerHTML = `You won with a score of: ${detail.score}, playing: ${detail.gameMode}`;
 }
 function getTile(grid, size, position) {
     return grid.childNodes[position.x + position.y * size];

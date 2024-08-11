@@ -1,4 +1,4 @@
-﻿import {Point, SnakeGame, Direction, Mode} from "./SnakeGame.js";
+﻿import {Point, SnakeGame, Direction, Mode, VictoryEventDetail} from "./SnakeGame.js";
 
 var GameInProgess = false;
 var Game: SnakeGame;
@@ -190,7 +190,9 @@ function finishGame() : void {
     ($('#game-message')[0] as HTMLElement).innerHTML = "Game over";
 }
 
-function finishGameVictory() : void {
+function finishGameVictory(e: CustomEvent) : void {
+
+    let detail: VictoryEventDetail = e.detail;
 
     GameEnded = true;
     GameInProgess = false;
@@ -199,7 +201,7 @@ function finishGameVictory() : void {
     Game.removeEventListener("victory", finishGame);
     Game.removeEventListener("failure", finishGame);
 
-    ($('#game-message')[0] as HTMLElement).innerHTML = "Victory!";
+    ($('#game-message')[0] as HTMLElement).innerHTML = `You won with a score of: ${detail.score}, playing: ${detail.gameMode}`;
 }
 
 function getTile(grid : HTMLElement, size : number, position: Point) : HTMLElement {
