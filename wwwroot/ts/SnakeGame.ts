@@ -13,6 +13,21 @@ export class Point {
         this.x = x;
         this.y = y;
     }
+
+    equals(other: Point) : boolean {
+
+        if (this.x != other.x) {
+
+            return false;
+        }
+
+        if (this.y != other.y) {
+
+            return false;
+        }
+
+        return true;
+    }
 }
 
 export class Grid{
@@ -137,16 +152,13 @@ export class SnakeGame extends EventTarget {
 
         this.#progressGameState();
         this.#spawnFruitRandom();
-        //updateGridElements(game, grid);
 
         if (this.#ended) {
             return;
         }
 
-        //if the game isn't ended - call next tick
-        //delay next this given delayMs
+        //Call next tick delayed
         new Promise<void>(resolve => setTimeout(resolve, this.mode.tickMiliseconds)).then(() => { this.#gameTick() });
-        
         this.dispatchEvent(this.tick);
     }
 
@@ -168,7 +180,7 @@ export class SnakeGame extends EventTarget {
             this.dispatchEvent(this.failure);
         }
 
-        if (this.#isPointOnSnake(newHeadPos) && !this.#posAreEqual(newHeadPos, this.snake.end)) {
+        if (this.#isPointOnSnake(newHeadPos) && !(newHeadPos.equals(this.snake.end))){
             this.#ended = true;
             this.#inProgress = false;
             this.dispatchEvent(this.failure);
@@ -264,42 +276,27 @@ export class SnakeGame extends EventTarget {
         return this.grid.getTile(position) == 2;
     }
 
-    #posAreEqual(first: Point, second: Point): boolean {
-
-    if (first.x != second.x) {
-
-        return false;
-    }
-
-    if (first.y != second.y) {
-
-        return false;
-    }
-
-    return true;
-    }
-
     #getPositionInDirection(position: Point, direction: Direction): Point {
 
-    let newPos: Point = { ...position };
+        let newPos: Point = new Point(position.x, position.y);
 
-    switch (direction) {
+        switch (direction) {
 
-        case "down":
-            newPos.y += 1;
-            break;
-        case "up":
-            newPos.y -= 1;
-            break;
-        case "right":
-            newPos.x += 1;
-            break;
-        case "left":
-            newPos.x -= 1;
+            case "down":
+                newPos.y += 1;
+                break;
+            case "up":
+                newPos.y -= 1;
+                break;
+            case "right":
+                newPos.x += 1;
+                break;
+            case "left":
+                newPos.x -= 1;
+        }
+
+        return newPos;
     }
-
-    return newPos;
-}
 }
 
 export class Mode {

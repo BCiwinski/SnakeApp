@@ -9,7 +9,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _SnakeGame_instances, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_gameTick, _SnakeGame_progressGameState, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_isPointOutsideTheBoard, _SnakeGame_isPointOnSnake, _SnakeGame_posAreEqual, _SnakeGame_getPositionInDirection;
+var _SnakeGame_instances, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_gameTick, _SnakeGame_progressGameState, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_isPointOutsideTheBoard, _SnakeGame_isPointOnSnake, _SnakeGame_getPositionInDirection;
 const EMPTY = 0;
 const HEAD = 1;
 const SNAKE = 2;
@@ -18,6 +18,15 @@ export class Point {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+    }
+    equals(other) {
+        if (this.x != other.x) {
+            return false;
+        }
+        if (this.y != other.y) {
+            return false;
+        }
+        return true;
     }
 }
 export class Grid {
@@ -86,12 +95,10 @@ _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeG
     }
     __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_progressGameState).call(this);
     __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_spawnFruitRandom).call(this);
-    //updateGridElements(game, grid);
     if (__classPrivateFieldGet(this, _SnakeGame_ended, "f")) {
         return;
     }
-    //if the game isn't ended - call next tick
-    //delay next this given delayMs
+    //Call next tick delayed
     new Promise(resolve => setTimeout(resolve, this.mode.tickMiliseconds)).then(() => { __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_gameTick).call(this); });
     this.dispatchEvent(this.tick);
 }, _SnakeGame_progressGameState = function _SnakeGame_progressGameState() {
@@ -108,7 +115,7 @@ _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeG
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
         this.dispatchEvent(this.failure);
     }
-    if (__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_isPointOnSnake).call(this, newHeadPos) && !__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_posAreEqual).call(this, newHeadPos, this.snake.end)) {
+    if (__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_isPointOnSnake).call(this, newHeadPos) && !(newHeadPos.equals(this.snake.end))) {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
         this.dispatchEvent(this.failure);
@@ -167,16 +174,8 @@ _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeG
     return false;
 }, _SnakeGame_isPointOnSnake = function _SnakeGame_isPointOnSnake(position) {
     return this.grid.getTile(position) == 2;
-}, _SnakeGame_posAreEqual = function _SnakeGame_posAreEqual(first, second) {
-    if (first.x != second.x) {
-        return false;
-    }
-    if (first.y != second.y) {
-        return false;
-    }
-    return true;
 }, _SnakeGame_getPositionInDirection = function _SnakeGame_getPositionInDirection(position, direction) {
-    let newPos = Object.assign({}, position);
+    let newPos = new Point(position.x, position.y);
     switch (direction) {
         case "down":
             newPos.y += 1;
