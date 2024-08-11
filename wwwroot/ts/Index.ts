@@ -1,7 +1,7 @@
-﻿import {Point, Grid, Snake, State, Direction, Mode} from "./Point.js";
+﻿import {Point, SnakeGame, Direction, Mode} from "./SnakeGame.js";
 
 var GameInProgess = false;
-var GameState: State;
+var Game: SnakeGame;
 
 var GameEnded: boolean = true;
 
@@ -29,7 +29,7 @@ $(function () {
         parsed.TickMiliseconds);
 
 
-    GameState = prepareGame($('#game-grid')[0], gameMode);
+    Game = prepareGame($('#game-grid')[0], gameMode);
 
 
     //Add event listener to all gamemode-controlling buttons for changing gamemodes
@@ -52,7 +52,7 @@ $(function () {
                 parsed.FruitSpawnNumber,
                 parsed.TickMiliseconds);
 
-            GameState = prepareGame($('#game-grid')[0], gameMode);
+            Game = prepareGame($('#game-grid')[0], gameMode);
         })
     })
 
@@ -80,22 +80,22 @@ $(function () {
 
         if (GameInProgess) {
 
-            GameState.currentDirection = current;
+            Game.currentDirection = current;
         }
 
         if ((e.key == 's' || 'a' || 's' || 'd') && !GameInProgess) {
 
             if (GameEnded) {
 
-                GameState = prepareGame($('#game-grid')[0], gameMode);
+                Game = prepareGame($('#game-grid')[0], gameMode);
             }
 
-            startGame($('#game-message')[0], GameState);
+            startGame($('#game-message')[0], Game);
         }
     })
 });
 
-function startGame(message: HTMLElement, state : State) : void{
+function startGame(message: HTMLElement, state: SnakeGame) : void{
 
     GameInProgess = true;
     message.innerText = "It's snake o'Clock!";
@@ -104,23 +104,23 @@ function startGame(message: HTMLElement, state : State) : void{
     new Promise<void>(resolve => setTimeout(resolve, 1000)).then(() => { state.start(); });
 }
 
-function prepareGame(grid: HTMLElement, gameMode : Mode) : State{
+function prepareGame(grid: HTMLElement, gameMode: Mode): SnakeGame{
 
     clearBoard(grid);
     generateBoardElements(grid, gameMode.size);
 
-    GameState = new State(grid, gameMode);
+    Game = new SnakeGame(grid, gameMode);
 
-    GameState.addEventListener("tick", updateGridElements);
-    GameState.addEventListener("victory", finishGameVictory);
-    GameState.addEventListener("failure", finishGame);
+    Game.addEventListener("tick", updateGridElements);
+    Game.addEventListener("victory", finishGameVictory);
+    Game.addEventListener("failure", finishGame);
 
     
     updateGridElements();
 
     GameEnded = false;
 
-    return GameState;
+    return Game;
 }
 
 //function for removing all tiles/squares the game takes place on
@@ -155,21 +155,21 @@ function generateBoardElements(grid : HTMLElement, size : number) : void {
 
 //main function for "rendering" the game
 //adds and removes attributes of gridElement's child elements to reflect given gameState
-function updateGridElements() {
+function updateGridElements() : void {
 
     let grid: HTMLElement = $('#game-grid')[0];
 
-    for (let i = 0; i < GameState.grid.size; i++) {
+    for (let i = 0; i < Game.grid.size; i++) {
 
-        for (let j = 0; j < GameState.grid.size; j++) {
+        for (let j = 0; j < Game.grid.size; j++) {
 
-            const element = getTile(grid, GameState.grid.size, { x: i, y: j });
+            const element = getTile(grid, Game.grid.size, new Point(i, j));
 
             for (let [obj, attr] of GameObjToAttr) {
 
                 element.removeAttribute(attr);
 
-                if (GameState.grid.getTile(new Point(i, j)) == obj) {
+                if (Game.grid.getTile(new Point(i, j)) == obj) {
 
                     element.setAttribute(attr, "");
                 }
@@ -178,33 +178,33 @@ function updateGridElements() {
     }
 }
 
-function finishGame() {
+function finishGame() : void {
 
     GameEnded = true;
     GameInProgess = false;
 
-    GameState.removeEventListener("tick", updateGridElements);
-    GameState.removeEventListener("victory", finishGameVictory);
-    GameState.removeEventListener("failure", finishGame);
+    Game.removeEventListener("tick", updateGridElements);
+    Game.removeEventListener("victory", finishGameVictory);
+    Game.removeEventListener("failure", finishGame);
 
     ($('#game-message')[0] as HTMLElement).innerHTML = "Game over";
 }
 
-function finishGameVictory() {
+function finishGameVictory() : void {
 
     GameEnded = true;
     GameInProgess = false;
 
-    GameState.removeEventListener("tick", updateGridElements);
-    GameState.removeEventListener("victory", finishGame);
-    GameState.removeEventListener("failure", finishGame);
+    Game.removeEventListener("tick", updateGridElements);
+    Game.removeEventListener("victory", finishGame);
+    Game.removeEventListener("failure", finishGame);
 
     ($('#game-message')[0] as HTMLElement).innerHTML = "Victory!";
 }
 
 //retrive a tile/square element at position x - right, y - down
 //position is {x: int, y: int}
-function getTile(grid : HTMLElement, size : number, position) : HTMLElement {
+function getTile(grid : HTMLElement, size : number, position: Point) : HTMLElement {
 
     return grid.childNodes[position.x + position.y * size] as HTMLElement;
 }

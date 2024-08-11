@@ -74,7 +74,7 @@ export class Snake {
     }
 }
 
-export class State extends EventTarget {
+export class SnakeGame extends EventTarget {
 
     tick: Event = new Event("tick");
 

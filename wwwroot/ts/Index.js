@@ -1,6 +1,6 @@
-import { Point, State, Mode } from "./Point.js";
+import { Point, SnakeGame, Mode } from "./SnakeGame.js";
 var GameInProgess = false;
-var GameState;
+var Game;
 var GameEnded = true;
 const HEAD_ATTR = "head";
 const SNAKE_ATTR = "snake";
@@ -14,7 +14,7 @@ $(function () {
     //This should be the most basic/stadard gamemode
     let parsed = JSON.parse($(".gamemode-button")[0].value);
     let gameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.TickMiliseconds);
-    GameState = prepareGame($('#game-grid')[0], gameMode);
+    Game = prepareGame($('#game-grid')[0], gameMode);
     //Add event listener to all gamemode-controlling buttons for changing gamemodes
     $(".gamemode-button").each(function (index, element) {
         this.addEventListener('click', function (e) {
@@ -24,7 +24,7 @@ $(function () {
             }
             let parsed = JSON.parse(element.value);
             gameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.TickMiliseconds);
-            GameState = prepareGame($('#game-grid')[0], gameMode);
+            Game = prepareGame($('#game-grid')[0], gameMode);
         });
     });
     //Handle user input
@@ -47,13 +47,13 @@ $(function () {
                 break;
         }
         if (GameInProgess) {
-            GameState.currentDirection = current;
+            Game.currentDirection = current;
         }
         if ((e.key == 's' || 'a' || 's' || 'd') && !GameInProgess) {
             if (GameEnded) {
-                GameState = prepareGame($('#game-grid')[0], gameMode);
+                Game = prepareGame($('#game-grid')[0], gameMode);
             }
-            startGame($('#game-message')[0], GameState);
+            startGame($('#game-message')[0], Game);
         }
     });
 });
@@ -66,13 +66,13 @@ function startGame(message, state) {
 function prepareGame(grid, gameMode) {
     clearBoard(grid);
     generateBoardElements(grid, gameMode.size);
-    GameState = new State(grid, gameMode);
-    GameState.addEventListener("tick", updateGridElements);
-    GameState.addEventListener("victory", finishGameVictory);
-    GameState.addEventListener("failure", finishGame);
+    Game = new SnakeGame(grid, gameMode);
+    Game.addEventListener("tick", updateGridElements);
+    Game.addEventListener("victory", finishGameVictory);
+    Game.addEventListener("failure", finishGame);
     updateGridElements();
     GameEnded = false;
-    return GameState;
+    return Game;
 }
 //function for removing all tiles/squares the game takes place on
 function clearBoard(grid) {
@@ -97,12 +97,12 @@ function generateBoardElements(grid, size) {
 //adds and removes attributes of gridElement's child elements to reflect given gameState
 function updateGridElements() {
     let grid = $('#game-grid')[0];
-    for (let i = 0; i < GameState.grid.size; i++) {
-        for (let j = 0; j < GameState.grid.size; j++) {
-            const element = getTile(grid, GameState.grid.size, { x: i, y: j });
+    for (let i = 0; i < Game.grid.size; i++) {
+        for (let j = 0; j < Game.grid.size; j++) {
+            const element = getTile(grid, Game.grid.size, new Point(i, j));
             for (let [obj, attr] of GameObjToAttr) {
                 element.removeAttribute(attr);
-                if (GameState.grid.getTile(new Point(i, j)) == obj) {
+                if (Game.grid.getTile(new Point(i, j)) == obj) {
                     element.setAttribute(attr, "");
                 }
             }
@@ -112,17 +112,17 @@ function updateGridElements() {
 function finishGame() {
     GameEnded = true;
     GameInProgess = false;
-    GameState.removeEventListener("tick", updateGridElements);
-    GameState.removeEventListener("victory", finishGameVictory);
-    GameState.removeEventListener("failure", finishGame);
+    Game.removeEventListener("tick", updateGridElements);
+    Game.removeEventListener("victory", finishGameVictory);
+    Game.removeEventListener("failure", finishGame);
     $('#game-message')[0].innerHTML = "Game over";
 }
 function finishGameVictory() {
     GameEnded = true;
     GameInProgess = false;
-    GameState.removeEventListener("tick", updateGridElements);
-    GameState.removeEventListener("victory", finishGame);
-    GameState.removeEventListener("failure", finishGame);
+    Game.removeEventListener("tick", updateGridElements);
+    Game.removeEventListener("victory", finishGame);
+    Game.removeEventListener("failure", finishGame);
     $('#game-message')[0].innerHTML = "Victory!";
 }
 //retrive a tile/square element at position x - right, y - down
