@@ -126,7 +126,6 @@ export class SnakeGame extends EventTarget {
         super();
         _SnakeGame_instances.add(this);
         this.tick = new Event("tick");
-        this.failure = new Event("failure");
         _SnakeGame_tick.set(this, 0);
         _SnakeGame_ended.set(this, false);
         _SnakeGame_inProgress.set(this, false);
@@ -168,20 +167,19 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
     if (__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_isWon).call(this)) {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
-        this.victory = new CustomEvent("victory", { detail: new VictoryEventDetail(__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_score).call(this), this.mode.name) });
-        this.dispatchEvent(this.victory);
+        this.dispatchEvent(new CustomEvent("victory", { detail: new VictoryEventDetail(__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_score).call(this), this.mode.name) }));
         return;
     }
     let result = this.snake.move(this.currentDirection);
     if (result == "isOutside") {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
-        this.dispatchEvent(this.failure);
+        this.dispatchEvent(new CustomEvent("failure", { detail: new FailureEventDetail("isOutside") }));
     }
     if (result == "bitSelf") {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
-        this.dispatchEvent(this.failure);
+        this.dispatchEvent(new CustomEvent("failure", { detail: new FailureEventDetail("bitSelf") }));
     }
 }, _SnakeGame_spawnFruitRandom = function _SnakeGame_spawnFruitRandom() {
     for (let i = 0; i < this.mode.fruitSpawnNumber; i++) {
@@ -221,6 +219,11 @@ export class VictoryEventDetail {
     constructor(score, gameMode) {
         this.score = score;
         this.gameMode = gameMode;
+    }
+}
+export class FailureEventDetail {
+    constructor(outcome) {
+        this.outcome = outcome;
     }
 }
 export class Mode {

@@ -69,7 +69,7 @@ function prepareGame(grid, gameMode) {
     Game = new SnakeGame(grid, gameMode);
     Game.addEventListener("tick", updateGridElements);
     Game.addEventListener("victory", finishGameVictory);
-    Game.addEventListener("failure", finishGame);
+    Game.addEventListener("failure", finishGameFailure);
     updateGridElements();
     GameEnded = false;
     return Game;
@@ -109,21 +109,29 @@ function updateGridElements() {
         }
     }
 }
-function finishGame() {
+function finishGameFailure(e) {
+    let detail = e.detail;
     GameEnded = true;
     GameInProgess = false;
     Game.removeEventListener("tick", updateGridElements);
     Game.removeEventListener("victory", finishGameVictory);
-    Game.removeEventListener("failure", finishGame);
-    $('#game-message')[0].innerHTML = "Game over";
+    Game.removeEventListener("failure", finishGameFailure);
+    let text = "Game over";
+    if (detail.outcome == "bitSelf") {
+        text = "Snake bit itself :(";
+    }
+    if (detail.outcome == "isOutside") {
+        text = "Snake bumped its head :(";
+    }
+    $('#game-message')[0].innerHTML = text;
 }
 function finishGameVictory(e) {
     let detail = e.detail;
     GameEnded = true;
     GameInProgess = false;
     Game.removeEventListener("tick", updateGridElements);
-    Game.removeEventListener("victory", finishGame);
-    Game.removeEventListener("failure", finishGame);
+    Game.removeEventListener("victory", finishGameFailure);
+    Game.removeEventListener("failure", finishGameFailure);
     $('#game-message')[0].innerHTML = `You won with a score of: ${detail.score}, playing: ${detail.gameMode}`;
 }
 function getTile(grid, size, position) {

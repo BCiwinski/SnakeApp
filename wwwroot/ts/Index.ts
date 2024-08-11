@@ -1,4 +1,4 @@
-﻿import {Point, SnakeGame, Direction, Mode, VictoryEventDetail} from "./SnakeGame.js";
+﻿import {Point, SnakeGame, Direction, Mode, VictoryEventDetail, FailureEventDetail} from "./SnakeGame.js";
 
 var GameInProgess = false;
 var Game: SnakeGame;
@@ -113,7 +113,7 @@ function prepareGame(grid: HTMLElement, gameMode: Mode): SnakeGame{
 
     Game.addEventListener("tick", updateGridElements);
     Game.addEventListener("victory", finishGameVictory);
-    Game.addEventListener("failure", finishGame);
+    Game.addEventListener("failure", finishGameFailure);
 
     
     updateGridElements();
@@ -178,16 +178,30 @@ function updateGridElements() : void {
     }
 }
 
-function finishGame() : void {
+function finishGameFailure(e: CustomEvent) : void {
+
+    let detail: FailureEventDetail = e.detail;
 
     GameEnded = true;
     GameInProgess = false;
 
     Game.removeEventListener("tick", updateGridElements);
     Game.removeEventListener("victory", finishGameVictory);
-    Game.removeEventListener("failure", finishGame);
+    Game.removeEventListener("failure", finishGameFailure);
 
-    ($('#game-message')[0] as HTMLElement).innerHTML = "Game over";
+    let text: string = "Game over";
+
+    if (detail.outcome == "bitSelf") {
+
+        text = "Snake bit itself :(";
+    }
+
+    if (detail.outcome == "isOutside") {
+
+        text = "Snake bumped its head :(";
+    }
+
+    ($('#game-message')[0] as HTMLElement).innerHTML = text;
 }
 
 function finishGameVictory(e: CustomEvent) : void {
@@ -198,8 +212,8 @@ function finishGameVictory(e: CustomEvent) : void {
     GameInProgess = false;
 
     Game.removeEventListener("tick", updateGridElements);
-    Game.removeEventListener("victory", finishGame);
-    Game.removeEventListener("failure", finishGame);
+    Game.removeEventListener("victory", finishGameFailure);
+    Game.removeEventListener("failure", finishGameFailure);
 
     ($('#game-message')[0] as HTMLElement).innerHTML = `You won with a score of: ${detail.score}, playing: ${detail.gameMode}`;
 }

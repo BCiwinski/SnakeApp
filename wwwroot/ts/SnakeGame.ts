@@ -182,10 +182,6 @@ export class SnakeGame extends EventTarget {
 
     tick: Event = new Event("tick");
 
-    victory: CustomEvent;
-
-    failure: Event = new Event("failure");
-
     element: HTMLElement
 
     grid: Grid
@@ -259,9 +255,7 @@ export class SnakeGame extends EventTarget {
         if (this.#isWon()) {
             this.#ended = true;
             this.#inProgress = false;
-
-            this.victory = new CustomEvent("victory", { detail: new VictoryEventDetail(this.#score(), this.mode.name) });
-            this.dispatchEvent(this.victory);
+            this.dispatchEvent(new CustomEvent("victory", { detail: new VictoryEventDetail(this.#score(), this.mode.name) }));
             return;
         }
 
@@ -271,14 +265,14 @@ export class SnakeGame extends EventTarget {
 
             this.#ended = true;
             this.#inProgress = false;
-            this.dispatchEvent(this.failure);
+            this.dispatchEvent(new CustomEvent("failure", { detail: new FailureEventDetail("isOutside") }));
         }
 
         if (result == "bitSelf") {
 
             this.#ended = true;
             this.#inProgress = false;
-            this.dispatchEvent(this.failure);
+            this.dispatchEvent(new CustomEvent("failure", { detail: new FailureEventDetail("bitSelf") }));
         }
     }
 
@@ -340,6 +334,8 @@ export class SnakeGame extends EventTarget {
     }
 }
 
+export type GameOutcome = "victory" | "bitSelf" | "isOutside";
+
 export class VictoryEventDetail {
     
     score: number
@@ -350,6 +346,16 @@ export class VictoryEventDetail {
 
         this.score = score;
         this.gameMode = gameMode;
+    }
+}
+
+export class FailureEventDetail {
+
+    outcome: GameOutcome
+
+    constructor(outcome: GameOutcome) {
+
+        this.outcome = outcome;
     }
 }
 
