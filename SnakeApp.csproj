@@ -6,4 +6,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.5.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\Index\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\ts\Index.js" />
+    <None Include="wwwroot\ts\Index.js.map" />
+    <None Include="wwwroot\ts\SnakeGame.js" />
+    <None Include="wwwroot\ts\SnakeGame.js.map" />
+  </ItemGroup>
+
 </Project>
