@@ -125,8 +125,6 @@ function finishGameVictory() {
     Game.removeEventListener("failure", finishGame);
     $('#game-message')[0].innerHTML = "Victory!";
 }
-//retrive a tile/square element at position x - right, y - down
-//position is {x: int, y: int}
 function getTile(grid, size, position) {
     return grid.childNodes[position.x + position.y * size];
 }

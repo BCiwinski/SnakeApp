@@ -202,8 +202,6 @@ function finishGameVictory() : void {
     ($('#game-message')[0] as HTMLElement).innerHTML = "Victory!";
 }
 
-//retrive a tile/square element at position x - right, y - down
-//position is {x: int, y: int}
 function getTile(grid : HTMLElement, size : number, position: Point) : HTMLElement {
 
     return grid.childNodes[position.x + position.y * size] as HTMLElement;

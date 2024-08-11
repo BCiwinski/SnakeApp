@@ -48,7 +48,7 @@ export class Grid{
 
             for (let j = 0; j < size; j++) {
 
-                row.push(0);
+                row.push(EMPTY);
             }
 
             this.tiles.push(row);
@@ -64,9 +64,26 @@ export class Grid{
 
         return this.tiles[atPoint.x][atPoint.y];
     }
+
+    isOutside(point: Point): boolean {
+
+        if (point.x < 0)
+            return true;
+
+        if (point.y < 0)
+            return true;
+
+        if (point.x >= this.size)
+            return true;
+
+        if (point.y >= this.size)
+            return true;
+
+        return false;
+    }
 }
 
-export class Snake {
+class Snake {
 
     grid: Grid
 
@@ -84,8 +101,8 @@ export class Snake {
         this.body.push(this.end);
         this.head = new Point(0, 1);
 
-        this.body.forEach(function (value: Point) { grid.setTile(2, value) })
-        grid.setTile(1, this.head);
+        this.body.forEach(function (value: Point) { grid.setTile(SNAKE, value) })
+        grid.setTile(HEAD, this.head);
     }
 }
 
@@ -150,7 +167,7 @@ export class SnakeGame extends EventTarget {
             return;
         }
 
-        this.#progressGameState();
+        this.#progress();
         this.#spawnFruitRandom();
 
         if (this.#ended) {
@@ -162,7 +179,7 @@ export class SnakeGame extends EventTarget {
         this.dispatchEvent(this.tick);
     }
 
-    #progressGameState(): void {
+    #progress(): void {
 
         if (this.#isWon()) {
             this.#ended = true;
@@ -174,7 +191,7 @@ export class SnakeGame extends EventTarget {
         const oldHeadPos: Point = new Point(this.snake.head.x, this.snake.head.y);
         const newHeadPos: Point = this.#getPositionInDirection(this.snake.head, this.currentDirection);
 
-        if (this.#isPointOutsideTheBoard(newHeadPos)) {
+        if (this.grid.isOutside(newHeadPos)) {
             this.#ended = true;
             this.#inProgress = false;
             this.dispatchEvent(this.failure);
@@ -254,26 +271,9 @@ export class SnakeGame extends EventTarget {
     return true;
 }
 
-    #isPointOutsideTheBoard(point: Point): boolean {
-
-        if (point.x < 0)
-            return true;
-
-        if (point.y < 0)
-            return true;
-
-        if (point.x >= this.grid.size)
-            return true;
-
-        if (point.y >= this.grid.size)
-            return true;
-
-        return false;
-    }
-
     #isPointOnSnake(position: Point): boolean {
 
-        return this.grid.getTile(position) == 2;
+        return this.grid.getTile(position) == SNAKE;
     }
 
     #getPositionInDirection(position: Point, direction: Direction): Point {
