@@ -192,6 +192,8 @@ export class SnakeGame extends EventTarget {
 
     snake: Snake
 
+    #tick: number = 0;
+
     #ended: boolean = false;
 
     #inProgress: boolean = false;
@@ -239,6 +241,7 @@ export class SnakeGame extends EventTarget {
             return;
         }
 
+        this.#tick += 1;
         this.#progress();
         this.#spawnFruitRandom();
 
@@ -320,7 +323,19 @@ export class SnakeGame extends EventTarget {
     }
 
     return true;
-}
+    }
+
+    #score() : number {
+
+        if (this.#tick == 0) {
+            return 0;
+        }
+
+        let lengthMultiplier = 10;
+        let quotient = Math.sqrt(this.#tick);
+
+        return Math.ceil((this.snake.length() * lengthMultiplier) / quotient);
+    }
 }
 
 export class Mode {

@@ -9,7 +9,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _Snake_instances, _Snake_bitSelf, _SnakeGame_instances, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon;
+var _Snake_instances, _Snake_bitSelf, _SnakeGame_instances, _SnakeGame_tick, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_score;
 const EMPTY = 0;
 const HEAD = 1;
 const SNAKE = 2;
@@ -128,6 +128,7 @@ export class SnakeGame extends EventTarget {
         this.tick = new Event("tick");
         this.victory = new Event("victory");
         this.failure = new Event("failure");
+        _SnakeGame_tick.set(this, 0);
         _SnakeGame_ended.set(this, false);
         _SnakeGame_inProgress.set(this, false);
         this.currentDirection = "down";
@@ -151,10 +152,11 @@ export class SnakeGame extends EventTarget {
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
     }
 }
-_SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_gameTick = function _SnakeGame_gameTick() {
+_SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_gameTick = function _SnakeGame_gameTick() {
     if (!__classPrivateFieldGet(this, _SnakeGame_inProgress, "f")) {
         return;
     }
+    __classPrivateFieldSet(this, _SnakeGame_tick, __classPrivateFieldGet(this, _SnakeGame_tick, "f") + 1, "f");
     __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_progress).call(this);
     __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_spawnFruitRandom).call(this);
     if (__classPrivateFieldGet(this, _SnakeGame_ended, "f")) {
@@ -207,6 +209,13 @@ _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeG
         }
     }
     return true;
+}, _SnakeGame_score = function _SnakeGame_score() {
+    if (__classPrivateFieldGet(this, _SnakeGame_tick, "f") == 0) {
+        return 0;
+    }
+    let lengthMultiplier = 10;
+    let quotient = Math.sqrt(__classPrivateFieldGet(this, _SnakeGame_tick, "f"));
+    return Math.ceil((this.snake.length() * lengthMultiplier) / quotient);
 };
 export class Mode {
     constructor(name, description, size, fruitSpawnChance, fruitSpawnPositionTries, fruitSpawnNumber, tickMiliseconds) {
