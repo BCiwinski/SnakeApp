@@ -1,5 +1,7 @@
 ﻿export type Direction = "down" | "up" | "right" | "left";
 
+type SnakeMoveResult = "ok" | "isOutside" | "bitSelf";
+
 const EMPTY = 0;
 const HEAD = 1;
 const SNAKE = 2;
@@ -81,6 +83,28 @@ export class Grid{
 
         return false;
     }
+
+    getPositionInDirection(position: Point, direction: Direction): Point {
+
+        let newPos: Point = new Point(position.x, position.y);
+
+        switch (direction) {
+
+            case "down":
+                newPos.y += 1;
+                break;
+            case "up":
+                newPos.y -= 1;
+                break;
+            case "right":
+                newPos.x += 1;
+                break;
+            case "left":
+                newPos.x -= 1;
+        }
+
+        return newPos;
+    }
 }
 
 class Snake {
@@ -103,6 +127,54 @@ class Snake {
 
         this.body.forEach(function (value: Point) { grid.setTile(SNAKE, value) })
         grid.setTile(HEAD, this.head);
+    }
+
+    move(direction: Direction): SnakeMoveResult {
+
+        const oldHeadPos: Point = new Point(this.head.x, this.head.y);
+        const newHeadPos: Point = this.grid.getPositionInDirection(this.head, direction);
+
+        if (this.grid.isOutside(newHeadPos)) {
+            return "isOutside";
+        }
+
+        if (this.#bitSelf(newHeadPos) && !(newHeadPos.equals(this.end))) {
+            return "bitSelf";
+        }
+
+        this.body.push(oldHeadPos);
+
+        //see if snake's head will be on a tile containing fruit
+        if (this.grid.getTile(newHeadPos) == FRUIT) {
+
+            //add score
+        }
+        else {
+
+            //if snake wont be eating a fruit, move his end (remove one part)
+            this.grid.setTile(EMPTY, this.end);
+            this.body.shift();
+            this.end = this.body[0];
+        }
+
+        //move snake's head
+        this.head = newHeadPos;
+        this.grid.setTile(HEAD, newHeadPos);
+
+        //part of his body follows where his head was
+        this.grid.setTile(SNAKE, oldHeadPos);
+
+        return "ok";
+    }
+
+    #bitSelf(headPosition: Point): boolean {
+
+        return this.grid.getTile(headPosition) == SNAKE;
+    }
+
+    length() : number {
+
+        return this.body.length + 1;
     }
 }
 
@@ -188,42 +260,21 @@ export class SnakeGame extends EventTarget {
             return;
         }
 
-        const oldHeadPos: Point = new Point(this.snake.head.x, this.snake.head.y);
-        const newHeadPos: Point = this.#getPositionInDirection(this.snake.head, this.currentDirection);
+        let result = this.snake.move(this.currentDirection);
 
-        if (this.grid.isOutside(newHeadPos)) {
+        if (result == "isOutside") {
+
             this.#ended = true;
             this.#inProgress = false;
             this.dispatchEvent(this.failure);
         }
 
-        if (this.#isPointOnSnake(newHeadPos) && !(newHeadPos.equals(this.snake.end))){
+        if (result == "bitSelf") {
+
             this.#ended = true;
             this.#inProgress = false;
             this.dispatchEvent(this.failure);
         }
-
-        this.snake.body.push(oldHeadPos);
-
-        //see if snake's head will be on a tile containing fruit
-        if (this.grid.getTile(newHeadPos) == FRUIT) {
-
-            //add score
-        }
-        else {
-
-            //if snake wont be eating a fruit, move his end (remove one part)
-            this.grid.setTile(EMPTY, this.snake.end);
-            this.snake.body.shift();
-            this.snake.end = this.snake.body[0];
-        }
-
-        //move snake's head
-        this.snake.head = newHeadPos;
-        this.grid.setTile(HEAD, newHeadPos);
-
-        //part of his body follows where his head was
-        this.grid.setTile(SNAKE, oldHeadPos);
     }
 
     #spawnFruitRandom(): void {
@@ -270,33 +321,6 @@ export class SnakeGame extends EventTarget {
 
     return true;
 }
-
-    #isPointOnSnake(position: Point): boolean {
-
-        return this.grid.getTile(position) == SNAKE;
-    }
-
-    #getPositionInDirection(position: Point, direction: Direction): Point {
-
-        let newPos: Point = new Point(position.x, position.y);
-
-        switch (direction) {
-
-            case "down":
-                newPos.y += 1;
-                break;
-            case "up":
-                newPos.y -= 1;
-                break;
-            case "right":
-                newPos.x += 1;
-                break;
-            case "left":
-                newPos.x -= 1;
-        }
-
-        return newPos;
-    }
 }
 
 export class Mode {

@@ -9,7 +9,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _SnakeGame_instances, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_isPointOnSnake, _SnakeGame_getPositionInDirection;
+var _Snake_instances, _Snake_bitSelf, _SnakeGame_instances, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon;
 const EMPTY = 0;
 const HEAD = 1;
 const SNAKE = 2;
@@ -58,9 +58,27 @@ export class Grid {
             return true;
         return false;
     }
+    getPositionInDirection(position, direction) {
+        let newPos = new Point(position.x, position.y);
+        switch (direction) {
+            case "down":
+                newPos.y += 1;
+                break;
+            case "up":
+                newPos.y -= 1;
+                break;
+            case "right":
+                newPos.x += 1;
+                break;
+            case "left":
+                newPos.x -= 1;
+        }
+        return newPos;
+    }
 }
 class Snake {
     constructor(grid) {
+        _Snake_instances.add(this);
         this.grid = grid;
         this.body = new Array;
         this.end = new Point(0, 0);
@@ -69,7 +87,40 @@ class Snake {
         this.body.forEach(function (value) { grid.setTile(SNAKE, value); });
         grid.setTile(HEAD, this.head);
     }
+    move(direction) {
+        const oldHeadPos = new Point(this.head.x, this.head.y);
+        const newHeadPos = this.grid.getPositionInDirection(this.head, direction);
+        if (this.grid.isOutside(newHeadPos)) {
+            return "isOutside";
+        }
+        if (__classPrivateFieldGet(this, _Snake_instances, "m", _Snake_bitSelf).call(this, newHeadPos) && !(newHeadPos.equals(this.end))) {
+            return "bitSelf";
+        }
+        this.body.push(oldHeadPos);
+        //see if snake's head will be on a tile containing fruit
+        if (this.grid.getTile(newHeadPos) == FRUIT) {
+            //add score
+        }
+        else {
+            //if snake wont be eating a fruit, move his end (remove one part)
+            this.grid.setTile(EMPTY, this.end);
+            this.body.shift();
+            this.end = this.body[0];
+        }
+        //move snake's head
+        this.head = newHeadPos;
+        this.grid.setTile(HEAD, newHeadPos);
+        //part of his body follows where his head was
+        this.grid.setTile(SNAKE, oldHeadPos);
+        return "ok";
+    }
+    length() {
+        return this.body.length + 1;
+    }
 }
+_Snake_instances = new WeakSet(), _Snake_bitSelf = function _Snake_bitSelf(headPosition) {
+    return this.grid.getTile(headPosition) == SNAKE;
+};
 export class SnakeGame extends EventTarget {
     constructor(element, gameMode) {
         super();
@@ -119,34 +170,17 @@ _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeG
         this.dispatchEvent(this.victory);
         return;
     }
-    const oldHeadPos = new Point(this.snake.head.x, this.snake.head.y);
-    const newHeadPos = __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_getPositionInDirection).call(this, this.snake.head, this.currentDirection);
-    if (this.grid.isOutside(newHeadPos)) {
+    let result = this.snake.move(this.currentDirection);
+    if (result == "isOutside") {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
         this.dispatchEvent(this.failure);
     }
-    if (__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_isPointOnSnake).call(this, newHeadPos) && !(newHeadPos.equals(this.snake.end))) {
+    if (result == "bitSelf") {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
         this.dispatchEvent(this.failure);
     }
-    this.snake.body.push(oldHeadPos);
-    //see if snake's head will be on a tile containing fruit
-    if (this.grid.getTile(newHeadPos) == FRUIT) {
-        //add score
-    }
-    else {
-        //if snake wont be eating a fruit, move his end (remove one part)
-        this.grid.setTile(EMPTY, this.snake.end);
-        this.snake.body.shift();
-        this.snake.end = this.snake.body[0];
-    }
-    //move snake's head
-    this.snake.head = newHeadPos;
-    this.grid.setTile(HEAD, newHeadPos);
-    //part of his body follows where his head was
-    this.grid.setTile(SNAKE, oldHeadPos);
 }, _SnakeGame_spawnFruitRandom = function _SnakeGame_spawnFruitRandom() {
     for (let i = 0; i < this.mode.fruitSpawnNumber; i++) {
         let rand = Math.random() * this.mode.fruitSpawnChance;
@@ -173,24 +207,6 @@ _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeG
         }
     }
     return true;
-}, _SnakeGame_isPointOnSnake = function _SnakeGame_isPointOnSnake(position) {
-    return this.grid.getTile(position) == SNAKE;
-}, _SnakeGame_getPositionInDirection = function _SnakeGame_getPositionInDirection(position, direction) {
-    let newPos = new Point(position.x, position.y);
-    switch (direction) {
-        case "down":
-            newPos.y += 1;
-            break;
-        case "up":
-            newPos.y -= 1;
-            break;
-        case "right":
-            newPos.x += 1;
-            break;
-        case "left":
-            newPos.x -= 1;
-    }
-    return newPos;
 };
 export class Mode {
     constructor(name, description, size, fruitSpawnChance, fruitSpawnPositionTries, fruitSpawnNumber, tickMiliseconds) {
