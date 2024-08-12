@@ -10,7 +10,28 @@ GameObjToAttr.set(1, HEAD_ATTR);
 GameObjToAttr.set(2, SNAKE_ATTR);
 GameObjToAttr.set(3, FRUIT_ATTR);
 $(function () {
-    //By default (on DOM load) assume first gamemode button's gamemode (it's value)
+    let dialog = $("#scoreDialog")[0];
+    //TODO: Show when a game is won - remove from here
+    dialog.showModal();
+    let nameInput = $("#scoreDialogNameInput")[0];
+    let dialogSubmit = $("#scoreDialogSubmit")[0];
+    dialogSubmit.addEventListener("click", function (e) {
+        if (nameInput.value.length == 0) {
+            dialog.close();
+            return;
+        }
+        if (nameInput.value.length <= 3) {
+            alert("Please put in a name longer than 3 characters");
+            return;
+        }
+        const request = { Name: nameInput.value, Score: 100 };
+        const string = JSON.stringify(request);
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "score/add", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(string);
+    });
+    //By default (on DOM load) assume first gamemode button's gamemode (its value)
     //This should be the most basic/stadard gamemode
     let parsed = JSON.parse($(".gamemode-button")[0].value);
     let gameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.TickMiliseconds);

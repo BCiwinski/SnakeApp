@@ -19,6 +19,16 @@
         <div id="game-grid"></div>
     </div>
     <p id="game-message">Press one of the keys to begin.</p>
+    <dialog id="scoreDialog">
+        <div>
+            <p>Would you like to submit your score?</p>
+            <label>
+                Your name:
+                <input id="scoreDialogNameInput" type="text" name="name"/>
+            </label>
+            <input id="scoreDialogSubmit" type="submit" value="Submit" />
+        </div>
+    </dialog>
 </div>
 
 <script type="module">import * as index from "./ts/Index.js"</script>
