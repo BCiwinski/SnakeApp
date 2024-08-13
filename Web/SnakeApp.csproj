@@ -24,4 +24,8 @@
     <None Include="wwwroot\ts\SnakeGame.js.map" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SnakeGame\SnakeGame.Api\SnakeGame.Api.csproj" />
+  </ItemGroup>
+
 </Project>
