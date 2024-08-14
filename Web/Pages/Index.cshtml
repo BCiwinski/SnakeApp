@@ -1,6 +1,7 @@
 ﻿@page
 @using SnakeApp.Model
 @using System.Text.Json
+@using SnakeGame.Infrastructure.Entities
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -15,6 +16,15 @@
             <button type="button" title="@gamemode.Description" class="gamemode-button btn" value="@JsonSerializer.Serialize(gamemode)"><h2>@gamemode.Name</h2></button><br/>
         }
     </aside>
+    <aside class="left">
+        <h2>Leaderboard</h2>
+        <ol>
+            @foreach(Score score in Model.TopScores)
+            {
+                <li>@($"{score.Name} - {score.Value}")</li>
+            }
+        </ol>
+    </aside>
     <div id="game">
         <div id="game-grid"></div>
     </div>
@@ -26,7 +36,7 @@
                 Your name:
                 <input id="scoreDialogNameInput" type="text" name="name"/>
             </label>
-            <input id="scoreDialogSubmit" type="submit" value="Submit" />
+            <input id="scoreDialogSubmit" type="submit" value="Submit" autofocus/>
         </div>
     </dialog>
 </div>

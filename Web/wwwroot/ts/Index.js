@@ -9,27 +9,28 @@ const GameObjToAttr = new Map;
 GameObjToAttr.set(1, HEAD_ATTR);
 GameObjToAttr.set(2, SNAKE_ATTR);
 GameObjToAttr.set(3, FRUIT_ATTR);
+let Dialog;
+let Score = 0;
 $(function () {
-    let dialog = $("#scoreDialog")[0];
-    //TODO: Show when a game is won - remove from here
-    dialog.showModal();
+    Dialog = $("#scoreDialog")[0];
     let nameInput = $("#scoreDialogNameInput")[0];
     let dialogSubmit = $("#scoreDialogSubmit")[0];
     dialogSubmit.addEventListener("click", function (e) {
         if (nameInput.value.length == 0) {
-            dialog.close();
+            Dialog.close();
             return;
         }
         if (nameInput.value.length <= 3) {
             alert("Please put in a name longer than 3 characters");
             return;
         }
-        const request = { Name: nameInput.value, Score: 100, GameMode: Game.mode.name };
+        const request = { Name: nameInput.value, Score: Score, GameMode: Game.mode.name };
         const string = JSON.stringify(request);
         const xhttp = new XMLHttpRequest();
         xhttp.open("POST", "score/add", true);
         xhttp.setRequestHeader("Content-type", "application/json");
         xhttp.send(string);
+        Dialog.close();
     });
     //By default (on DOM load) assume first gamemode button's gamemode (its value)
     //This should be the most basic/stadard gamemode
@@ -154,6 +155,9 @@ function finishGameVictory(e) {
     Game.removeEventListener("victory", finishGameFailure);
     Game.removeEventListener("failure", finishGameFailure);
     $('#game-message')[0].innerHTML = `You won with a score of: ${detail.score}, playing: ${detail.gameMode}`;
+    //Show dialog for user to input their name and submit score
+    Score = e.detail.score;
+    Dialog.showModal();
 }
 function getTile(grid, size, position) {
     return grid.childNodes[position.x + position.y * size];

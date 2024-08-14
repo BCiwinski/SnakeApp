@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnakeGame.Api", "SnakeGame\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnakeApp", "Web\SnakeApp.csproj", "{97B0A912-CEAD-4EB9-A728-EAB961848C9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnakeGame.Infrastructure", "SnakeGame\SnakeGame.Infrastructure\SnakeGame.Infrastructure.csproj", "{2EE33322-63D7-4F42-9E99-FDD0B8217001}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnakeGame.Infrastructure", "SnakeGame\SnakeGame.Infrastructure\SnakeGame.Infrastructure.csproj", "{2EE33322-63D7-4F42-9E99-FDD0B8217001}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnakeGame.Contracts", "SnakeGame\SnakeGame.Contracts\SnakeGame.Contracts.csproj", "{11157F6C-E896-4BBC-A143-3C08A308E120}"
 EndProject

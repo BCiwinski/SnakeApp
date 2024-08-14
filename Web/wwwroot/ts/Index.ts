@@ -14,20 +14,18 @@ GameObjToAttr.set(1, HEAD_ATTR);
 GameObjToAttr.set(2, SNAKE_ATTR);
 GameObjToAttr.set(3, FRUIT_ATTR);
 
+let Dialog: HTMLDialogElement;
+let Score: number = 0;
+
 $(function () {
 
-    let dialog: HTMLDialogElement = $("#scoreDialog")[0] as HTMLDialogElement;
-
-    //TODO: Show when a game is won - remove from here
-    dialog.showModal();
-
+    Dialog = $("#scoreDialog")[0] as HTMLDialogElement;
     let nameInput: HTMLInputElement = $("#scoreDialogNameInput")[0] as HTMLInputElement;
-
     let dialogSubmit: HTMLInputElement = $("#scoreDialogSubmit")[0] as HTMLInputElement;
     dialogSubmit.addEventListener("click", function (e) {
 
         if (nameInput.value.length == 0) {
-            dialog.close();
+            Dialog.close();
             return;
         }
 
@@ -37,13 +35,15 @@ $(function () {
             return;
         }
 
-        const request = { Name: nameInput.value, Score: 100, GameMode: Game.mode.name }
+        const request = { Name: nameInput.value, Score: Score, GameMode: Game.mode.name }
         const string = JSON.stringify(request);
 
         const xhttp = new XMLHttpRequest();
         xhttp.open("POST", "score/add", true);
         xhttp.setRequestHeader("Content-type", "application/json");
         xhttp.send(string);
+
+        Dialog.close();
     });
 
     //By default (on DOM load) assume first gamemode button's gamemode (its value)
@@ -246,6 +246,10 @@ function finishGameVictory(e: CustomEvent) : void {
     Game.removeEventListener("failure", finishGameFailure);
 
     ($('#game-message')[0] as HTMLElement).innerHTML = `You won with a score of: ${detail.score}, playing: ${detail.gameMode}`;
+
+    //Show dialog for user to input their name and submit score
+    Score = e.detail.score;
+    Dialog.showModal();
 }
 
 function getTile(grid : HTMLElement, size : number, position: Point) : HTMLElement {

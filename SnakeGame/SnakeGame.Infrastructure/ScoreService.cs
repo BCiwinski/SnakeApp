@@ -32,4 +32,9 @@ public class ScoreService
 
         await _context.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<Score>> GetTopScores(int amount)
+    {
+        return await _context.Scores.OrderByDescending(s => s.Value).Take(amount).ToArrayAsync();
+    }
 }
