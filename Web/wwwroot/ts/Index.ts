@@ -91,6 +91,10 @@ $(function () {
 
     window.addEventListener("keydown", function (e) {
 
+        if (Dialog.open) {
+            return;
+        }
+
         //Change direction-controlling var depending on user input
         //Refuse changing the direction to the opposite - snake cant move that way
         switch (e.key) {
