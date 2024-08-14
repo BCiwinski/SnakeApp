@@ -7,12 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SnakeGame.Contracts\SnakeGame.Contracts.csproj" />
-    <ProjectReference Include="..\SnakeGame.Infrastructure\SnakeGame.Infrastructure.csproj" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

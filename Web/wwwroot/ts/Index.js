@@ -24,7 +24,7 @@ $(function () {
             alert("Please put in a name longer than 3 characters");
             return;
         }
-        const request = { Name: nameInput.value, Score: 100 };
+        const request = { Name: nameInput.value, Score: 100, GameMode: Game.mode.name };
         const string = JSON.stringify(request);
         const xhttp = new XMLHttpRequest();
         xhttp.open("POST", "score/add", true);
