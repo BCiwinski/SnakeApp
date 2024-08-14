@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 using SnakeGame.Infrastructure.Entities;
 
@@ -19,17 +20,36 @@ public class ScoreService
 
     public async Task AddScore(string name, string gameMode, int score)
     {
-        if(await _context.Scores.AnyAsync(s =>  s.Name == name && s.GameMode == gameMode && s.Value == score))
+        var current = new Score()
         {
-            return;
-        }
-
-        await _context.Scores.AddAsync(new Score(){
             Name = name,
             GameMode = gameMode,
             Value = score,
-            CreatedAt = DateTimeOffset.Now});
+            CreatedAt = DateTimeOffset.Now
+        };
 
+        var previous = await _context.Scores.FirstOrDefaultAsync(s => s.Name == name && s.GameMode == gameMode);
+
+        if(previous is not null)
+        {
+            if (score <= previous.Value)
+            {
+                return;
+            }
+
+            _context.Scores.Remove(previous);
+            AddToDb(current);
+        }
+        else
+        {
+            await AddToDb(current);
+        }
+
+    }
+
+    private async Task AddToDb(Score score)
+    {
+        _context.Scores.Add(score);
         await _context.SaveChangesAsync();
     }
 
