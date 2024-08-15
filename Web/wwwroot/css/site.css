@@ -59,6 +59,10 @@ aside {
     float: right;
 }
 
+aside.left{
+    float: left;
+}
+
 .btn.gamemode-button {
     background-color: aliceblue;
     display: block;

@@ -1,12 +1,16 @@
-using Microsoft.Extensions.FileProviders;
+using Microsoft.EntityFrameworkCore;
 using SnakeApp.Model;
+using SnakeGame.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+
 builder.Services.Configure<GamemodeOptions>(builder.Configuration.GetSection("Gamemodes"));
+builder.Services.AddTransient<ScoreContext>();
+builder.Services.AddTransient<ScoreService>();
 
 var app = builder.Build();
 
@@ -18,12 +22,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.Services.GetService<ScoreContext>().Database.Migrate();
+
 app.UseHttpsRedirection();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.MapControllers();
 
 app.UseAuthorization();
 

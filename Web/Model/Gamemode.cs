@@ -14,5 +14,7 @@ public class Gamemode
 
     public int FruitSpawnNumber { get; set; }
 
+    public int FruitMaxAmount { get; set; }
+
     public int TickMiliseconds { get; set; }
 }

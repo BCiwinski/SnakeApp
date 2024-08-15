@@ -15,10 +15,24 @@
             <button type="button" title="@gamemode.Description" class="gamemode-button btn" value="@JsonSerializer.Serialize(gamemode)"><h2>@gamemode.Name</h2></button><br/>
         }
     </aside>
+    <aside class="left">
+        <h2>Leaderboard</h2>
+        <ol id="leaderboards-list"></ol>
+    </aside>
     <div id="game">
         <div id="game-grid"></div>
     </div>
     <p id="game-message">Press one of the keys to begin.</p>
+    <dialog id="scoreDialog">
+        <div>
+            <p>Would you like to submit your score?</p>
+            <label>
+                Your name:
+                <input id="scoreDialogNameInput" type="text" name="name" minlength="4" maxlength="20"/>
+            </label>
+            <input id="scoreDialogSubmit" type="submit" value="Submit" autofocus/>
+        </div>
+    </dialog>
 </div>
 
 <script type="module">import * as index from "./ts/Index.js"</script>
