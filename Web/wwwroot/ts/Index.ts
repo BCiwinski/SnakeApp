@@ -14,6 +14,7 @@ GameObjToAttr.set(1, HEAD_ATTR);
 GameObjToAttr.set(2, SNAKE_ATTR);
 GameObjToAttr.set(3, FRUIT_ATTR);
 
+const leaderboardScores: number = 10;
 let Dialog: HTMLDialogElement;
 let Score: number = 0;
 
@@ -35,13 +36,13 @@ $(function () {
             return;
         }
 
+        //send score info to server
         const request = { Name: nameInput.value, Score: Score, GameMode: Game.mode.name }
-        const string = JSON.stringify(request);
 
         const xhttp = new XMLHttpRequest();
         xhttp.open("POST", "score/add", true);
         xhttp.setRequestHeader("Content-type", "application/json");
-        xhttp.send(string);
+        xhttp.send(JSON.stringify(request));
 
         Dialog.close();
     });
@@ -58,6 +59,7 @@ $(function () {
         parsed.FruitSpawnNumber,
         parsed.TickMiliseconds);
 
+    getLeaderboardScores(leaderboardScores, gameMode.name);
 
     Game = prepareGame($('#game-grid')[0], gameMode);
 
@@ -81,6 +83,8 @@ $(function () {
                 parsed.FruitSpawnPositionTries,
                 parsed.FruitSpawnNumber,
                 parsed.TickMiliseconds);
+
+            getLeaderboardScores(leaderboardScores, gameMode.name);
 
             Game = prepareGame($('#game-grid')[0], gameMode);
         })
@@ -180,10 +184,10 @@ function generateBoardElements(grid : HTMLElement, size : number) : void {
 
     for (let i = 0; i < size * size; i++) {
 
-        let tag = document.createElement("div");
-        tag.className = "square";
+        let element = document.createElement("div");
+        element.className = "square";
 
-        grid.appendChild(tag);
+        grid.appendChild(element);
     }
 }
 
@@ -259,4 +263,34 @@ function finishGameVictory(e: CustomEvent) : void {
 function getTile(grid : HTMLElement, size : number, position: Point) : HTMLElement {
 
     return grid.childNodes[position.x + position.y * size] as HTMLElement;
+}
+
+function getLeaderboardScores(amount: number, gameMode: string) : void {
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.onload = onLeaderboardInfoRecived;
+    xhttp.open("GET", "score/top?Amount=" + amount + "&GameMode=" + gameMode, true);
+    xhttp.send();
+}
+
+function onLeaderboardInfoRecived() : void {
+
+    const response = JSON.parse(this.responseText);
+    const scores = response.scores;
+
+    let list = $("#leaderboards-list")[0] as HTMLElement;
+
+    //remove current elements
+    while (list.hasChildNodes()) {
+
+        list.removeChild(list.firstElementChild);
+    }
+
+    for (let i = 0; i < scores.length; i++) {
+
+        let element = document.createElement("li");
+        element.innerHTML = `${scores[i].name} - ${scores[i].score}`;
+
+        list.appendChild(element);
+    }
 }

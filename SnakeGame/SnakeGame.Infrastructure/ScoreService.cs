@@ -53,8 +53,13 @@ public class ScoreService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Score>> GetTopScores(int amount)
+    public async Task<IEnumerable<Score>> GetTopScores(int amount, string gameMode)
     {
-        return await _context.Scores.OrderByDescending(s => s.Value).Take(amount).ToArrayAsync();
+        return await _context.Scores
+            .Where(s => s.GameMode == gameMode)
+            .OrderByDescending(s => s.Value)
+            .ThenByDescending(s => s.CreatedAt)
+            .Take(amount)
+            .ToArrayAsync();
     }
 }

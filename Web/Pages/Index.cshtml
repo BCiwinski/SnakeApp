@@ -1,7 +1,6 @@
 ﻿@page
 @using SnakeApp.Model
 @using System.Text.Json
-@using SnakeGame.Infrastructure.Entities
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -18,12 +17,7 @@
     </aside>
     <aside class="left">
         <h2>Leaderboard</h2>
-        <ol>
-            @foreach(Score score in Model.TopScores)
-            {
-                <li>@($"{score.Name} - {score.Value}")</li>
-            }
-        </ol>
+        <ol id="leaderboards-list"></ol>
     </aside>
     <div id="game">
         <div id="game-grid"></div>

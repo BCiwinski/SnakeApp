@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace SnakeGame.Infrastructure.Entities;
+﻿namespace SnakeGame.Infrastructure.Entities;
 
 public class Score
 {

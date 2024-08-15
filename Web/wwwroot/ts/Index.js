@@ -9,6 +9,7 @@ const GameObjToAttr = new Map;
 GameObjToAttr.set(1, HEAD_ATTR);
 GameObjToAttr.set(2, SNAKE_ATTR);
 GameObjToAttr.set(3, FRUIT_ATTR);
+const leaderboardScores = 10;
 let Dialog;
 let Score = 0;
 $(function () {
@@ -24,18 +25,19 @@ $(function () {
             alert("Please put in a name longer than 3 characters");
             return;
         }
+        //send score info to server
         const request = { Name: nameInput.value, Score: Score, GameMode: Game.mode.name };
-        const string = JSON.stringify(request);
         const xhttp = new XMLHttpRequest();
         xhttp.open("POST", "score/add", true);
         xhttp.setRequestHeader("Content-type", "application/json");
-        xhttp.send(string);
+        xhttp.send(JSON.stringify(request));
         Dialog.close();
     });
     //By default (on DOM load) assume first gamemode button's gamemode (its value)
     //This should be the most basic/stadard gamemode
     let parsed = JSON.parse($(".gamemode-button")[0].value);
     let gameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.TickMiliseconds);
+    getLeaderboardScores(leaderboardScores, gameMode.name);
     Game = prepareGame($('#game-grid')[0], gameMode);
     //Add event listener to all gamemode-controlling buttons for changing gamemodes
     $(".gamemode-button").each(function (index, element) {
@@ -46,6 +48,7 @@ $(function () {
             }
             let parsed = JSON.parse(element.value);
             gameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.TickMiliseconds);
+            getLeaderboardScores(leaderboardScores, gameMode.name);
             Game = prepareGame($('#game-grid')[0], gameMode);
         });
     });
@@ -113,9 +116,9 @@ function generateBoardElements(grid, size) {
     }
     grid.style.gridTemplateColumns = columns;
     for (let i = 0; i < size * size; i++) {
-        let tag = document.createElement("div");
-        tag.className = "square";
-        grid.appendChild(tag);
+        let element = document.createElement("div");
+        element.className = "square";
+        grid.appendChild(element);
     }
 }
 //main function for "rendering" the game
@@ -164,5 +167,25 @@ function finishGameVictory(e) {
 }
 function getTile(grid, size, position) {
     return grid.childNodes[position.x + position.y * size];
+}
+function getLeaderboardScores(amount, gameMode) {
+    const xhttp = new XMLHttpRequest();
+    xhttp.onload = onLeaderboardInfoRecived;
+    xhttp.open("GET", "score/top?Amount=" + amount + "&GameMode=" + gameMode, true);
+    xhttp.send();
+}
+function onLeaderboardInfoRecived() {
+    const response = JSON.parse(this.responseText);
+    const scores = response.scores;
+    let list = $("#leaderboards-list")[0];
+    //remove current elements
+    while (list.hasChildNodes()) {
+        list.removeChild(list.firstElementChild);
+    }
+    for (let i = 0; i < scores.length; i++) {
+        let element = document.createElement("li");
+        element.innerHTML = `${scores[i].name} - ${scores[i].score}`;
+        list.appendChild(element);
+    }
 }
 //# sourceMappingURL=Index.js.map
