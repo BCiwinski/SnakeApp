@@ -19,7 +19,7 @@ $(function () {
     //By default (on DOM load) assume first gamemode button's gamemode (its value)
     //This should be the most basic/stadard gamemode
     let parsed = JSON.parse($(".gamemode-button")[0].value);
-    let gameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.TickMiliseconds);
+    let gameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.FruitMaxAmount, parsed.TickMiliseconds);
     getLeaderboardScores(leaderboardScores, gameMode.name);
     Game = prepareGame($('#game-grid')[0], gameMode);
     //Add event listener to all gamemode-controlling buttons for changing gamemodes
@@ -30,7 +30,7 @@ $(function () {
                 return;
             }
             let parsed = JSON.parse(element.value);
-            gameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.TickMiliseconds);
+            gameMode = new Mode(parsed.Name, parsed.Description, parsed.Size, parsed.FruitSpawnChance, parsed.FruitSpawnPositionTries, parsed.FruitSpawnNumber, parsed.FruitMaxAmount, parsed.TickMiliseconds);
             getLeaderboardScores(leaderboardScores, gameMode.name);
             Game = prepareGame($('#game-grid')[0], gameMode);
         });

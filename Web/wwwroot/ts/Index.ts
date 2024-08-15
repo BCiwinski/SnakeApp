@@ -34,6 +34,7 @@ $(function () {
         parsed.FruitSpawnChance,
         parsed.FruitSpawnPositionTries,
         parsed.FruitSpawnNumber,
+        parsed.FruitMaxAmount,
         parsed.TickMiliseconds);
 
     getLeaderboardScores(leaderboardScores, gameMode.name);
@@ -59,6 +60,7 @@ $(function () {
                 parsed.FruitSpawnChance,
                 parsed.FruitSpawnPositionTries,
                 parsed.FruitSpawnNumber,
+                parsed.FruitMaxAmount,
                 parsed.TickMiliseconds);
 
             getLeaderboardScores(leaderboardScores, gameMode.name);

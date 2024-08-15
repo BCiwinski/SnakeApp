@@ -9,7 +9,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _Snake_instances, _Snake_bitSelf, _SnakeGame_instances, _SnakeGame_tick, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_score;
+var _Snake_instances, _Snake_bitSelf, _SnakeGame_instances, _SnakeGame_tick, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_fruitAmount, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_score;
 const EMPTY = 0;
 const HEAD = 1;
 const SNAKE = 2;
@@ -88,6 +88,7 @@ class Snake {
         grid.setTile(HEAD, this.head);
     }
     move(direction) {
+        let ateFruit = false;
         const oldHeadPos = new Point(this.head.x, this.head.y);
         const newHeadPos = this.grid.getPositionInDirection(this.head, direction);
         if (this.grid.isOutside(newHeadPos)) {
@@ -99,7 +100,7 @@ class Snake {
         this.body.push(oldHeadPos);
         //see if snake's head will be on a tile containing fruit
         if (this.grid.getTile(newHeadPos) == FRUIT) {
-            //add score
+            ateFruit = true;
         }
         else {
             //if snake wont be eating a fruit, move his end (remove one part)
@@ -112,6 +113,9 @@ class Snake {
         this.grid.setTile(HEAD, newHeadPos);
         //part of his body follows where his head was
         this.grid.setTile(SNAKE, oldHeadPos);
+        if (ateFruit) {
+            return "ateFruit";
+        }
         return "ok";
     }
     length() {
@@ -129,6 +133,7 @@ export class SnakeGame extends EventTarget {
         _SnakeGame_tick.set(this, 0);
         _SnakeGame_ended.set(this, false);
         _SnakeGame_inProgress.set(this, false);
+        _SnakeGame_fruitAmount.set(this, 0);
         this.currentDirection = "down";
         this.element = element;
         this.mode = gameMode;
@@ -150,7 +155,7 @@ export class SnakeGame extends EventTarget {
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
     }
 }
-_SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_gameTick = function _SnakeGame_gameTick() {
+_SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_fruitAmount = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_gameTick = function _SnakeGame_gameTick() {
     if (!__classPrivateFieldGet(this, _SnakeGame_inProgress, "f")) {
         return;
     }
@@ -164,6 +169,7 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
     new Promise(resolve => setTimeout(resolve, this.mode.tickMiliseconds)).then(() => { __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_gameTick).call(this); });
     this.dispatchEvent(this.tick);
 }, _SnakeGame_progress = function _SnakeGame_progress() {
+    var _a;
     if (__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_isWon).call(this)) {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
@@ -181,8 +187,12 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
         this.dispatchEvent(new CustomEvent("failure", { detail: new FailureEventDetail("bitSelf") }));
     }
+    if (result == "ateFruit") {
+        __classPrivateFieldSet(this, _SnakeGame_fruitAmount, (_a = __classPrivateFieldGet(this, _SnakeGame_fruitAmount, "f"), _a--, _a), "f");
+    }
 }, _SnakeGame_spawnFruitRandom = function _SnakeGame_spawnFruitRandom() {
-    for (let i = 0; i < this.mode.fruitSpawnNumber; i++) {
+    var _a;
+    for (let i = 0; i < this.mode.fruitSpawnNumber && (__classPrivateFieldGet(this, _SnakeGame_fruitAmount, "f") < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
         let rand = Math.random() * this.mode.fruitSpawnChance;
         if (rand > 1.0) {
             continue;
@@ -192,6 +202,7 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
             let rand_y = Math.round(Math.random() * (this.grid.size - 1));
             let rand_point = new Point(rand_x, rand_y);
             if (this.grid.getTile(rand_point) == EMPTY) {
+                __classPrivateFieldSet(this, _SnakeGame_fruitAmount, (_a = __classPrivateFieldGet(this, _SnakeGame_fruitAmount, "f"), _a++, _a), "f");
                 this.grid.setTile(FRUIT, rand_point);
                 break;
             }
@@ -227,13 +238,14 @@ export class FailureEventDetail {
     }
 }
 export class Mode {
-    constructor(name, description, size, fruitSpawnChance, fruitSpawnPositionTries, fruitSpawnNumber, tickMiliseconds) {
+    constructor(name, description, size, fruitSpawnChance, fruitSpawnPositionTries, fruitSpawnNumber, fruitMaxAmount, tickMiliseconds) {
         this.name = name;
         this.description = description;
         this.size = size;
         this.fruitSpawnChance = fruitSpawnChance;
         this.fruitSpawnPositionTries = fruitSpawnPositionTries;
         this.fruitSpawnNumber = fruitSpawnNumber;
+        this.fruitMaxAmount = fruitMaxAmount;
         this.tickMiliseconds = tickMiliseconds;
     }
 }

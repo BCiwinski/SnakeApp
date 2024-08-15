@@ -1,6 +1,6 @@
 ﻿export type Direction = "down" | "up" | "right" | "left";
 
-type SnakeMoveResult = "ok" | "isOutside" | "bitSelf";
+type SnakeMoveResult = "ok" | "ateFruit" | "isOutside" | "bitSelf";
 
 const EMPTY = 0;
 const HEAD = 1;
@@ -131,6 +131,8 @@ class Snake {
 
     move(direction: Direction): SnakeMoveResult {
 
+        let ateFruit: boolean = false;
+
         const oldHeadPos: Point = new Point(this.head.x, this.head.y);
         const newHeadPos: Point = this.grid.getPositionInDirection(this.head, direction);
 
@@ -147,7 +149,7 @@ class Snake {
         //see if snake's head will be on a tile containing fruit
         if (this.grid.getTile(newHeadPos) == FRUIT) {
 
-            //add score
+            ateFruit = true;
         }
         else {
 
@@ -163,6 +165,10 @@ class Snake {
 
         //part of his body follows where his head was
         this.grid.setTile(SNAKE, oldHeadPos);
+
+        if (ateFruit) {
+            return "ateFruit";
+        }
 
         return "ok";
     }
@@ -193,6 +199,8 @@ export class SnakeGame extends EventTarget {
     #ended: boolean = false;
 
     #inProgress: boolean = false;
+
+    #fruitAmount: number = 0;
 
     mode: Mode
 
@@ -274,34 +282,40 @@ export class SnakeGame extends EventTarget {
             this.#inProgress = false;
             this.dispatchEvent(new CustomEvent("failure", { detail: new FailureEventDetail("bitSelf") }));
         }
+
+        if (result == "ateFruit") {
+
+            this.#fruitAmount--;
+        }
     }
 
     #spawnFruitRandom(): void {
 
-    for (let i = 0; i < this.mode.fruitSpawnNumber; i++) {
+        for (let i = 0; i < this.mode.fruitSpawnNumber && (this.#fruitAmount < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
 
-        let rand = Math.random() * this.mode.fruitSpawnChance;
+            let rand = Math.random() * this.mode.fruitSpawnChance;
 
-        if (rand > 1.0) {
-            continue;
-        }
-
-        for (let j = 0; j < this.mode.fruitSpawnPositionTries; j++) {
-
-            let rand_x = Math.round(Math.random() * (this.grid.size - 1));
-            let rand_y = Math.round(Math.random() * (this.grid.size - 1));
-
-            let rand_point = new Point(rand_x, rand_y);
-
-            if (this.grid.getTile(rand_point) == EMPTY) {
-
-                this.grid.setTile(FRUIT, rand_point);
-                break;
+            if (rand > 1.0) {
+                continue;
             }
 
+            for (let j = 0; j < this.mode.fruitSpawnPositionTries; j++) {
+
+                let rand_x = Math.round(Math.random() * (this.grid.size - 1));
+                let rand_y = Math.round(Math.random() * (this.grid.size - 1));
+
+                let rand_point = new Point(rand_x, rand_y);
+
+                if (this.grid.getTile(rand_point) == EMPTY) {
+
+                    this.#fruitAmount++;
+                    this.grid.setTile(FRUIT, rand_point);
+                    break;
+                }
+
+            }
         }
     }
-}
 
     #isWon(): boolean {
 
@@ -373,6 +387,8 @@ export class Mode {
 
     fruitSpawnNumber: number
 
+    fruitMaxAmount: number
+
     tickMiliseconds: number
 
     constructor(name: string,
@@ -381,6 +397,7 @@ export class Mode {
         fruitSpawnChance: number,
         fruitSpawnPositionTries: number,
         fruitSpawnNumber: number,
+        fruitMaxAmount: number,
         tickMiliseconds: number) {
 
         this.name = name;
@@ -389,6 +406,7 @@ export class Mode {
         this.fruitSpawnChance = fruitSpawnChance;
         this.fruitSpawnPositionTries = fruitSpawnPositionTries;
         this.fruitSpawnNumber = fruitSpawnNumber;
+        this.fruitMaxAmount = fruitMaxAmount;
         this.tickMiliseconds = tickMiliseconds;
     }
 }
