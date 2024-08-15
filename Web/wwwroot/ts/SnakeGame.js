@@ -9,7 +9,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _Snake_instances, _Snake_bitSelf, _SnakeGame_instances, _SnakeGame_tick, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_fruitAmount, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_score;
+var _Snake_instances, _Snake_bitSelf, _SnakeGame_instances, _SnakeGame_tick, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_fruitAmount, _SnakeGame_currentDirection, _SnakeGame_input, _SnakeGame_bufferedInput, _SnakeGame_inputConsumed, _SnakeGame_bufferedInputConsumed, _SnakeGame_isInputProper, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_score;
 const EMPTY = 0;
 const HEAD = 1;
 const SNAKE = 2;
@@ -134,7 +134,11 @@ export class SnakeGame extends EventTarget {
         _SnakeGame_ended.set(this, false);
         _SnakeGame_inProgress.set(this, false);
         _SnakeGame_fruitAmount.set(this, 0);
-        this.currentDirection = "down";
+        _SnakeGame_currentDirection.set(this, "down");
+        _SnakeGame_input.set(this, "down");
+        _SnakeGame_bufferedInput.set(this, "down");
+        _SnakeGame_inputConsumed.set(this, true);
+        _SnakeGame_bufferedInputConsumed.set(this, true);
         this.element = element;
         this.mode = gameMode;
         this.grid = new Grid(gameMode.size);
@@ -154,10 +158,60 @@ export class SnakeGame extends EventTarget {
         }
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
     }
+    input(newDirection) {
+        let input;
+        let bufferedInput;
+        if (__classPrivateFieldGet(this, _SnakeGame_inputConsumed, "f")) {
+            input = newDirection;
+        }
+        else {
+            if (!__classPrivateFieldGet(this, _SnakeGame_bufferedInputConsumed, "f")) {
+                //ignore input
+                return;
+            }
+            input = newDirection;
+        }
+        let proper = __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_isInputProper).call(this, input, !__classPrivateFieldGet(this, _SnakeGame_inputConsumed, "f"));
+        if (!proper) {
+            //ignore input
+            return;
+        }
+        if (__classPrivateFieldGet(this, _SnakeGame_inputConsumed, "f")) {
+            __classPrivateFieldSet(this, _SnakeGame_input, input, "f");
+            __classPrivateFieldSet(this, _SnakeGame_inputConsumed, false, "f");
+            return;
+        }
+        else {
+            __classPrivateFieldSet(this, _SnakeGame_bufferedInput, input, "f");
+            __classPrivateFieldSet(this, _SnakeGame_bufferedInputConsumed, false, "f");
+            return;
+        }
+    }
 }
-_SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_fruitAmount = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_gameTick = function _SnakeGame_gameTick() {
+_SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_fruitAmount = new WeakMap(), _SnakeGame_currentDirection = new WeakMap(), _SnakeGame_input = new WeakMap(), _SnakeGame_bufferedInput = new WeakMap(), _SnakeGame_inputConsumed = new WeakMap(), _SnakeGame_bufferedInputConsumed = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_isInputProper = function _SnakeGame_isInputProper(input, buffered) {
+    let against = buffered ? __classPrivateFieldGet(this, _SnakeGame_input, "f") : __classPrivateFieldGet(this, _SnakeGame_currentDirection, "f");
+    if (input == "up" && against == "down") {
+        return false;
+    }
+    if (input == "down" && against == "up") {
+        return false;
+    }
+    if (input == "left" && against == "right") {
+        return false;
+    }
+    if (input == "right" && against == "left") {
+        return false;
+    }
+    return true;
+}, _SnakeGame_gameTick = function _SnakeGame_gameTick() {
     if (!__classPrivateFieldGet(this, _SnakeGame_inProgress, "f")) {
         return;
+    }
+    if (!__classPrivateFieldGet(this, _SnakeGame_inputConsumed, "f")) {
+        __classPrivateFieldSet(this, _SnakeGame_currentDirection, __classPrivateFieldGet(this, _SnakeGame_input, "f"), "f");
+        __classPrivateFieldSet(this, _SnakeGame_input, __classPrivateFieldGet(this, _SnakeGame_bufferedInput, "f"), "f");
+        __classPrivateFieldSet(this, _SnakeGame_inputConsumed, __classPrivateFieldGet(this, _SnakeGame_bufferedInputConsumed, "f"), "f");
+        __classPrivateFieldSet(this, _SnakeGame_bufferedInputConsumed, true, "f");
     }
     __classPrivateFieldSet(this, _SnakeGame_tick, __classPrivateFieldGet(this, _SnakeGame_tick, "f") + 1, "f");
     __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_progress).call(this);
@@ -176,7 +230,7 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
         this.dispatchEvent(new CustomEvent("victory", { detail: new VictoryEventDetail(__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_score).call(this), this.mode.name) }));
         return;
     }
-    let result = this.snake.move(this.currentDirection);
+    let result = this.snake.move(__classPrivateFieldGet(this, _SnakeGame_currentDirection, "f"));
     if (result == "isOutside") {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");

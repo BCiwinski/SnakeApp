@@ -70,7 +70,7 @@ $(function () {
     })
 
     //Handle user input
-    var current: Direction = "down";
+    let current: Direction = "down";
 
     window.addEventListener("keydown", function (e) {
 
@@ -78,26 +78,25 @@ $(function () {
             return;
         }
 
-        //Change direction-controlling var depending on user input
-        //Refuse changing the direction to the opposite - snake cant move that way
+        //Map input
         switch (e.key) {
             case 's':
-                current = current == "up" ? "up" : "down";
+                current = "down";
                 break;
             case 'w':
-                current = current == "down" ? "down" : "up";
+                current = "up";
                 break;
             case 'd':
-                current = current == "left" ? "left" : "right";
+                current = "right";
                 break;
             case 'a':
-                current = current == "right" ? "right" : "left";
+                current = "left";
                 break;
         }
 
         if (GameInProgess) {
 
-            Game.currentDirection = current;
+            Game.input(current);
         }
 
         if ((e.key == 's' || 'a' || 's' || 'd') && !GameInProgess) {

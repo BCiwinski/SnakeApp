@@ -204,7 +204,15 @@ export class SnakeGame extends EventTarget {
 
     mode: Mode
 
-    currentDirection: Direction = "down";
+    #currentDirection: Direction = "down";
+
+    #input: Direction = "down";
+
+    #bufferedInput: Direction = "down";
+
+    #inputConsumed: boolean = true;
+
+    #bufferedInputConsumed: boolean = true;
 
     constructor(element: HTMLElement, gameMode: Mode) {
 
@@ -238,11 +246,83 @@ export class SnakeGame extends EventTarget {
         this.#inProgress = false;
     }
 
+    input(newDirection: Direction)
+    {
+        let input: Direction;
+        let bufferedInput: Direction;
+
+        if (this.#inputConsumed) {
+
+            input = newDirection;
+        }
+        else {
+
+            if (!this.#bufferedInputConsumed) {
+                //ignore input
+                return;
+            }
+
+            input = newDirection;
+        }
+
+        let proper: boolean = this.#isInputProper(input, !this.#inputConsumed);
+
+        if (!proper) {
+            //ignore input
+            return;
+        }
+
+        if (this.#inputConsumed) {
+
+            this.#input = input;
+            this.#inputConsumed = false;
+            return;
+        }
+        else {
+
+            this.#bufferedInput = input;
+            this.#bufferedInputConsumed = false;
+            return;
+        }
+    }
+
+    #isInputProper(input: Direction, buffered: boolean) : boolean {
+
+        let against = buffered ? this.#input : this.#currentDirection;
+
+        if (input == "up" && against == "down") {
+            return false;
+        }
+
+        if (input == "down" && against == "up") {
+            return false;
+        }
+
+        if (input == "left" && against == "right") {
+            return false;
+        }
+
+        if (input == "right" && against == "left") {
+            return false;
+        }
+
+        return true;
+    }
+
     #gameTick(): void {
 
         if(!this.#inProgress) {
 
             return;
+        }
+
+        if (!this.#inputConsumed) {
+
+            this.#currentDirection = this.#input;
+            this.#input = this.#bufferedInput;
+
+            this.#inputConsumed = this.#bufferedInputConsumed;
+            this.#bufferedInputConsumed = true;
         }
 
         this.#tick += 1;
@@ -267,7 +347,7 @@ export class SnakeGame extends EventTarget {
             return;
         }
 
-        let result = this.snake.move(this.currentDirection);
+        let result = this.snake.move(this.#currentDirection);
 
         if (result == "isOutside") {
 
