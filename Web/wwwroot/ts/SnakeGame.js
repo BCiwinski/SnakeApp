@@ -19,6 +19,11 @@ export class Point {
         this.x = x;
         this.y = y;
     }
+    /**
+     * Checks whether this point is exaclty the same as the other.
+     * @param other - the other tile.
+     * @returns
+     */
     equals(other) {
         if (this.x != other.x) {
             return false;
@@ -41,12 +46,27 @@ export class Grid {
             this.tiles.push(row);
         }
     }
+    /**
+     * Sets value for a tile at a give position.
+     * @param value - the value to set the tile to.
+     * @param atPoint - position of the tile.
+     */
     setTile(value, atPoint) {
         this.tiles[atPoint.x][atPoint.y] = value;
     }
+    /**
+     * Gets value for a tile at a given position.
+     * @param atPoint - postition of the tile.
+     * @returns
+     */
     getTile(atPoint) {
         return this.tiles[atPoint.x][atPoint.y];
     }
+    /**
+     * Check whetehr given point is outside of the grid.
+     * @param point
+     * @returns
+     */
     isOutside(point) {
         if (point.x < 0)
             return true;
@@ -58,6 +78,12 @@ export class Grid {
             return true;
         return false;
     }
+    /**
+     * Gets a position next to a given one, in a given direction.
+     * @param position - given position.
+     * @param direction - direction from give position.
+     * @returns
+     */
     getPositionInDirection(position, direction) {
         let newPos = new Point(position.x, position.y);
         switch (direction) {
@@ -87,6 +113,12 @@ class Snake {
         this.body.forEach(function (value) { grid.setTile(SNAKE, value); });
         grid.setTile(HEAD, this.head);
     }
+    /**
+     * Moves the snake in a given direction. The snake's head moves in the given direction and the rest of the body follows.
+     * Makes the snake longer when his head is moved into a tile containing fruit. Sets grid's values for the snake.
+     * @param direction - the direction sanke's head moves in.
+     * @returns
+     */
     move(direction) {
         let ateFruit = false;
         const oldHeadPos = new Point(this.head.x, this.head.y);
@@ -118,6 +150,10 @@ class Snake {
         }
         return "ok";
     }
+    /**
+     * Gives current length of the snake, including its head.
+     * @returns
+     */
     length() {
         return this.body.length + 1;
     }
@@ -145,6 +181,10 @@ export class SnakeGame extends EventTarget {
         this.snake = new Snake(this.grid);
         __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_spawnFruitRandom).call(this);
     }
+    /**
+     * Starts the game. Can be use to unpause it. Does nothing, if the game has already ended.
+     * @returns
+     */
     start() {
         if (__classPrivateFieldGet(this, _SnakeGame_inProgress, "f") || __classPrivateFieldGet(this, _SnakeGame_ended, "f")) {
             return;
@@ -152,12 +192,21 @@ export class SnakeGame extends EventTarget {
         __classPrivateFieldSet(this, _SnakeGame_inProgress, true, "f");
         __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_gameTick).call(this);
     }
+    /**
+     * Pauses the game. Can be unpaused by start().
+     * @returns
+     */
     stop() {
         if (!__classPrivateFieldGet(this, _SnakeGame_inProgress, "f")) {
             return;
         }
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
     }
+    /**
+     * A method for handling user input.
+     * @param newDirection - the direction for the snake to move in.
+     * @returns
+     */
     input(newDirection) {
         let input;
         let bufferedInput;

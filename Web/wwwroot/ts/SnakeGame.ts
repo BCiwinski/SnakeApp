@@ -16,6 +16,11 @@ export class Point {
         this.y = y;
     }
 
+    /**
+     * Checks whether this point is exaclty the same as the other.
+     * @param other - the other tile.
+     * @returns
+     */
     equals(other: Point) : boolean {
 
         if (this.x != other.x) {
@@ -57,16 +62,31 @@ export class Grid{
         }
     }
 
+    /**
+     * Sets value for a tile at a give position.
+     * @param value - the value to set the tile to.
+     * @param atPoint - position of the tile.
+     */
     setTile(value: number, atPoint: Point): void {
 
         this.tiles[atPoint.x][atPoint.y] = value;
     }
 
+    /**
+     * Gets value for a tile at a given position.
+     * @param atPoint - postition of the tile.
+     * @returns
+     */
     getTile(atPoint: Point): number {
 
         return this.tiles[atPoint.x][atPoint.y];
     }
 
+    /**
+     * Check whetehr given point is outside of the grid.
+     * @param point
+     * @returns
+     */
     isOutside(point: Point): boolean {
 
         if (point.x < 0)
@@ -84,6 +104,12 @@ export class Grid{
         return false;
     }
 
+    /**
+     * Gets a position next to a given one, in a given direction.
+     * @param position - given position.
+     * @param direction - direction from give position.
+     * @returns
+     */
     getPositionInDirection(position: Point, direction: Direction): Point {
 
         let newPos: Point = new Point(position.x, position.y);
@@ -129,6 +155,12 @@ class Snake {
         grid.setTile(HEAD, this.head);
     }
 
+    /**
+     * Moves the snake in a given direction. The snake's head moves in the given direction and the rest of the body follows.
+     * Makes the snake longer when his head is moved into a tile containing fruit. Sets grid's values for the snake.
+     * @param direction - the direction sanke's head moves in.
+     * @returns
+     */
     move(direction: Direction): SnakeMoveResult {
 
         let ateFruit: boolean = false;
@@ -173,11 +205,20 @@ class Snake {
         return "ok";
     }
 
+    /**
+     * Check whether a snakes head, in a given position would result in a snake biting itself.
+     * @param headPosition - the position to test.
+     * @returns
+     */
     #bitSelf(headPosition: Point): boolean {
 
         return this.grid.getTile(headPosition) == SNAKE;
     }
 
+    /**
+     * Gives current length of the snake, including its head.
+     * @returns
+     */
     length() : number {
 
         return this.body.length + 1;
@@ -227,6 +268,10 @@ export class SnakeGame extends EventTarget {
         this.#spawnFruitRandom();
     }
 
+    /**
+     * Starts the game. Can be use to unpause it. Does nothing, if the game has already ended.
+     * @returns
+     */
     start() {
 
         if (this.#inProgress || this.#ended) {
@@ -237,6 +282,10 @@ export class SnakeGame extends EventTarget {
         this.#gameTick();
     }
 
+    /**
+     * Pauses the game. Can be unpaused by start().
+     * @returns
+     */
     stop() {
 
         if (!this.#inProgress) {
@@ -246,6 +295,11 @@ export class SnakeGame extends EventTarget {
         this.#inProgress = false;
     }
 
+    /**
+     * A method for handling user input.
+     * @param newDirection - the direction for the snake to move in.
+     * @returns
+     */
     input(newDirection: Direction)
     {
         let input: Direction;
@@ -286,6 +340,12 @@ export class SnakeGame extends EventTarget {
         }
     }
 
+    /**
+     * Checks whether given input can be performed. Snake cannot immedietly change direction from up/down and left/right.
+     * @param input - given Direction, to check.
+     * @param buffered - whether a given input is to be checked as buffered or non-buffered.
+     * @returns
+     */
     #isInputProper(input: Direction, buffered: boolean) : boolean {
 
         let against = buffered ? this.#input : this.#currentDirection;
@@ -309,6 +369,11 @@ export class SnakeGame extends EventTarget {
         return true;
     }
 
+    /**
+     * Game's main loop, handling all main logic. Calls itself with a certain delay, to progress the game until it reaches end
+     * or until it's paused.
+     * @returns
+     */
     #gameTick(): void {
 
         if(!this.#inProgress) {
@@ -338,6 +403,11 @@ export class SnakeGame extends EventTarget {
         this.dispatchEvent(this.tick);
     }
 
+    /**
+     * Handles snake's movement and tests for failure or victory.
+     * Publishes failure and victory events.
+     * @returns
+     */
     #progress(): void {
 
         if (this.#isWon()) {
@@ -369,6 +439,9 @@ export class SnakeGame extends EventTarget {
         }
     }
 
+    /**
+     * Spawns fruits using random number generator and values from Mode.
+     */
     #spawnFruitRandom(): void {
 
         for (let i = 0; i < this.mode.fruitSpawnNumber && (this.#fruitAmount < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
@@ -397,6 +470,10 @@ export class SnakeGame extends EventTarget {
         }
     }
 
+    /**
+     * Tests whether the game is won.
+     * @returns
+     */
     #isWon(): boolean {
 
     for (let i = 0; i < this.grid.size; i++) {
@@ -415,6 +492,11 @@ export class SnakeGame extends EventTarget {
     return true;
     }
 
+    /**
+     * Computes a number representing how "well" the game was played. It balances amount of fruit eaten (more -> higher score)
+     * and amount of ticks passed (more -> lower score).
+     * @returns
+     */
     #score() : number {
 
         if (this.#tick == 0) {
