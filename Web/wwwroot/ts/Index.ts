@@ -296,6 +296,7 @@ function postScore(name: string, score: number, gameMode: string) : void {
     const request = { Name: name, Score: score, GameMode: gameMode }
 
     const xhttp = new XMLHttpRequest();
+    xhttp.onload = function () {getLeaderboardScores(leaderboardScores, Game.mode.name) }
     xhttp.open("POST", "score/add", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(JSON.stringify(request));
