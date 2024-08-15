@@ -21,31 +21,8 @@ let Score: number = 0;
 $(function () {
 
     Dialog = $("#scoreDialog")[0] as HTMLDialogElement;
-    let nameInput: HTMLInputElement = $("#scoreDialogNameInput")[0] as HTMLInputElement;
     let dialogSubmit: HTMLInputElement = $("#scoreDialogSubmit")[0] as HTMLInputElement;
-    dialogSubmit.addEventListener("click", function (e) {
-
-        if (nameInput.value.length == 0) {
-            Dialog.close();
-            return;
-        }
-
-        if (nameInput.value.length <= 3) {
-
-            alert("Please put in a name longer than 3 characters");
-            return;
-        }
-
-        //send score info to server
-        const request = { Name: nameInput.value, Score: Score, GameMode: Game.mode.name }
-
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "score/add", true);
-        xhttp.setRequestHeader("Content-type", "application/json");
-        xhttp.send(JSON.stringify(request));
-
-        Dialog.close();
-    });
+    dialogSubmit.addEventListener("click", onDialogSubmitClick);
 
     //By default (on DOM load) assume first gamemode button's gamemode (its value)
     //This should be the most basic/stadard gamemode
@@ -293,4 +270,33 @@ function onLeaderboardInfoRecived() : void {
 
         list.appendChild(element);
     }
+}
+
+function onDialogSubmitClick() {
+
+    let nameInput: HTMLInputElement = $("#scoreDialogNameInput")[0] as HTMLInputElement;
+
+    if (nameInput.value.length == 0) {
+        Dialog.close();
+        return;
+    }
+
+    if (nameInput.value.length <= 3) {
+
+        alert("Please put in a name longer than 3 characters");
+        return;
+    }
+
+    postScore(nameInput.value, Score, Game.mode.name);
+    Dialog.close();
+}
+
+function postScore(name: string, score: number, gameMode: string) : void {
+
+    const request = { Name: name, Score: score, GameMode: gameMode }
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "score/add", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(JSON.stringify(request));
 }

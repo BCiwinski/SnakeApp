@@ -14,25 +14,8 @@ let Dialog;
 let Score = 0;
 $(function () {
     Dialog = $("#scoreDialog")[0];
-    let nameInput = $("#scoreDialogNameInput")[0];
     let dialogSubmit = $("#scoreDialogSubmit")[0];
-    dialogSubmit.addEventListener("click", function (e) {
-        if (nameInput.value.length == 0) {
-            Dialog.close();
-            return;
-        }
-        if (nameInput.value.length <= 3) {
-            alert("Please put in a name longer than 3 characters");
-            return;
-        }
-        //send score info to server
-        const request = { Name: nameInput.value, Score: Score, GameMode: Game.mode.name };
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "score/add", true);
-        xhttp.setRequestHeader("Content-type", "application/json");
-        xhttp.send(JSON.stringify(request));
-        Dialog.close();
-    });
+    dialogSubmit.addEventListener("click", onDialogSubmitClick);
     //By default (on DOM load) assume first gamemode button's gamemode (its value)
     //This should be the most basic/stadard gamemode
     let parsed = JSON.parse($(".gamemode-button")[0].value);
@@ -187,5 +170,25 @@ function onLeaderboardInfoRecived() {
         element.innerHTML = `${scores[i].name} - ${scores[i].score}`;
         list.appendChild(element);
     }
+}
+function onDialogSubmitClick() {
+    let nameInput = $("#scoreDialogNameInput")[0];
+    if (nameInput.value.length == 0) {
+        Dialog.close();
+        return;
+    }
+    if (nameInput.value.length <= 3) {
+        alert("Please put in a name longer than 3 characters");
+        return;
+    }
+    postScore(nameInput.value, Score, Game.mode.name);
+    Dialog.close();
+}
+function postScore(name, score, gameMode) {
+    const request = { Name: name, Score: score, GameMode: gameMode };
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "score/add", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(JSON.stringify(request));
 }
 //# sourceMappingURL=Index.js.map
