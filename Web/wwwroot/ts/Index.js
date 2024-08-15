@@ -63,18 +63,30 @@ $(function () {
             if (GameEnded) {
                 Game = prepareGame($('#game-grid')[0], gameMode);
             }
-            startGame($('#game-message')[0], Game);
+            startGame($('#game-message')[0], Game, 1000);
         }
     });
 });
-function startGame(message, state) {
+/**
+ * Starts the snake game and modifies.
+ * @param message - HTMLElement that shows a massage about game being started.
+ * @param game - The game to be started.
+ * @param delayMs - delay for starting the game, in miliseconds.
+ */
+function startGame(message, game, delayMs) {
     GameInProgess = true;
     message.innerText = "It's snake o'Clock!";
     //start the game - delay a bit
-    new Promise(resolve => setTimeout(resolve, 1000)).then(() => { state.start(); });
+    new Promise(resolve => setTimeout(resolve, delayMs)).then(() => { game.start(); });
 }
+/**
+ * Prepares html elements for the game a be displayed on and makes the game object.
+ * @param grid - HTMLElement to create grid on.
+ * @param gameMode - Game mode info.
+ * @returns
+ */
 function prepareGame(grid, gameMode) {
-    clearBoard(grid);
+    removeChildren(grid);
     generateBoardElements(grid, gameMode.size);
     Game = new SnakeGame(grid, gameMode);
     Game.addEventListener("tick", updateGridElements);
@@ -84,27 +96,36 @@ function prepareGame(grid, gameMode) {
     GameEnded = false;
     return Game;
 }
-//function for removing all tiles/squares the game takes place on
-function clearBoard(grid) {
-    while (grid.hasChildNodes()) {
-        grid.removeChild(grid.firstElementChild);
+/**
+ * Removes all childeren of a given element.
+ * @param element - the element to remove childern of.
+ */
+function removeChildren(element) {
+    while (element.hasChildNodes()) {
+        element.removeChild(element.firstElementChild);
     }
 }
-//create size^2 elements as child nods of gridElement
-function generateBoardElements(grid, size) {
+/**
+ * Creates a size^2 <div> elements of class "square" and adds them as chldren to board.
+ * @param board - the element to add generated elements to.
+ * @param size
+ */
+function generateBoardElements(board, size) {
     let columns = "auto";
     for (let i = 1; i < size; i++) {
         columns += " auto";
     }
-    grid.style.gridTemplateColumns = columns;
+    board.style.gridTemplateColumns = columns;
     for (let i = 0; i < size * size; i++) {
         let element = document.createElement("div");
         element.className = "square";
-        grid.appendChild(element);
+        board.appendChild(element);
     }
 }
-//main function for "rendering" the game
 //adds and removes attributes of gridElement's child elements to reflect given gameState
+/**
+ * Compares Game's state against children of '#game-grid'. Removes and adds attributes accordingly.
+ */
 function updateGridElements() {
     let grid = $('#game-grid')[0];
     for (let i = 0; i < Game.grid.size; i++) {
@@ -119,6 +140,10 @@ function updateGridElements() {
         }
     }
 }
+/**
+ * Finalazes the game when failed and uses '#game-message' for displaying failure message.
+ * @param e - CustomEvenet having e.detail of type FailureEventDetail.
+ */
 function finishGameFailure(e) {
     let detail = e.detail;
     GameEnded = true;
@@ -135,6 +160,11 @@ function finishGameFailure(e) {
     }
     $('#game-message')[0].innerHTML = text;
 }
+/**
+ * Finalizes the game when won and uses '#game-message' for displaying victory message.
+ * Shows a dialog for user to submit their score.
+ * @param e - CustomEvenet having e.detail of type VictoryEventDetail.
+ */
 function finishGameVictory(e) {
     let detail = e.detail;
     GameEnded = true;
@@ -147,15 +177,30 @@ function finishGameVictory(e) {
     Score = e.detail.score;
     Dialog.showModal();
 }
+/**
+ * Returns an element that is in x-column and y-row and a child of grid.
+ * @param grid - the element to get the child of.
+ * @param size - size of the board.
+ * @param position - position of the child element.
+ * @returns
+ */
 function getTile(grid, size, position) {
     return grid.childNodes[position.x + position.y * size];
 }
+/**
+ * Fetch leaderboard info and update it.
+ * @param amount - amount leaderboard's score to fetch.
+ * @param gameMode - get scores of this game mode.
+ */
 function getLeaderboardScores(amount, gameMode) {
     const xhttp = new XMLHttpRequest();
     xhttp.onload = onLeaderboardInfoRecived;
     xhttp.open("GET", "score/top?Amount=" + amount + "&GameMode=" + gameMode, true);
     xhttp.send();
 }
+/**
+ * Update leaderboard with recived information.
+ */
 function onLeaderboardInfoRecived() {
     const response = JSON.parse(this.responseText);
     const scores = response.scores;
@@ -170,6 +215,9 @@ function onLeaderboardInfoRecived() {
         list.appendChild(element);
     }
 }
+/**
+ * Posts user's score with provided name. Displays and error message for input shorter than 4 characters.
+ */
 function onDialogSubmitClick() {
     let nameInput = $("#scoreDialogNameInput")[0];
     if (nameInput.value.length == 0) {
@@ -183,6 +231,12 @@ function onDialogSubmitClick() {
     postScore(nameInput.value, Score, Game.mode.name);
     Dialog.close();
 }
+/**
+ * Posts score with the given name, score and game mode.
+ * @param name - name of the user achiving the score.
+ * @param score - numeric value of the score.
+ * @param gameMode - the game mode of the game.
+ */
 function postScore(name, score, gameMode) {
     const request = { Name: name, Score: score, GameMode: gameMode };
     const xhttp = new XMLHttpRequest();
