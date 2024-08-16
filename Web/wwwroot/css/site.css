@@ -21,6 +21,11 @@ body {
   margin-bottom: 60px;
 }
 
+canvas#game-canvas {
+    width: 100%;
+    aspect-ratio: 1/1;
+}
+
 #game {
     aspect-ratio: 1/1;
     width: 60vmin;

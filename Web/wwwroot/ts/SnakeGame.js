@@ -9,7 +9,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _Snake_instances, _Snake_bitSelf, _SnakeGame_instances, _SnakeGame_tick, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_fruitAmount, _SnakeGame_currentDirection, _SnakeGame_input, _SnakeGame_bufferedInput, _SnakeGame_inputConsumed, _SnakeGame_bufferedInputConsumed, _SnakeGame_isInputProper, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_score;
+var _Snake_instances, _Snake_bitSelf, _SnakeGame_instances, _SnakeGame_tick, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_fruitAmount, _SnakeGame_currentDirection, _SnakeGame_input, _SnakeGame_bufferedInput, _SnakeGame_inputConsumed, _SnakeGame_bufferedInputConsumed, _SnakeGame_renderer, _SnakeGame_isInputProper, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_score, _Renderer_context, _Renderer_grid, _Renderer_width, _Renderer_height, _Renderer_tileWidth, _Renderer_tileHeight;
 const EMPTY = 0;
 const HEAD = 1;
 const SNAKE = 2;
@@ -162,7 +162,7 @@ _Snake_instances = new WeakSet(), _Snake_bitSelf = function _Snake_bitSelf(headP
     return this.grid.getTile(headPosition) == SNAKE;
 };
 export class SnakeGame extends EventTarget {
-    constructor(element, gameMode) {
+    constructor(gameMode, renderingContext) {
         super();
         _SnakeGame_instances.add(this);
         this.tick = new Event("tick");
@@ -175,11 +175,13 @@ export class SnakeGame extends EventTarget {
         _SnakeGame_bufferedInput.set(this, "down");
         _SnakeGame_inputConsumed.set(this, true);
         _SnakeGame_bufferedInputConsumed.set(this, true);
-        this.element = element;
+        _SnakeGame_renderer.set(this, void 0);
         this.mode = gameMode;
         this.grid = new Grid(gameMode.size);
         this.snake = new Snake(this.grid);
+        __classPrivateFieldSet(this, _SnakeGame_renderer, new Renderer(renderingContext, this.grid), "f");
         __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_spawnFruitRandom).call(this);
+        __classPrivateFieldGet(this, _SnakeGame_renderer, "f").update();
     }
     /**
      * Starts the game. Can be use to unpause it. Does nothing, if the game has already ended.
@@ -237,7 +239,7 @@ export class SnakeGame extends EventTarget {
         }
     }
 }
-_SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_fruitAmount = new WeakMap(), _SnakeGame_currentDirection = new WeakMap(), _SnakeGame_input = new WeakMap(), _SnakeGame_bufferedInput = new WeakMap(), _SnakeGame_inputConsumed = new WeakMap(), _SnakeGame_bufferedInputConsumed = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_isInputProper = function _SnakeGame_isInputProper(input, buffered) {
+_SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_fruitAmount = new WeakMap(), _SnakeGame_currentDirection = new WeakMap(), _SnakeGame_input = new WeakMap(), _SnakeGame_bufferedInput = new WeakMap(), _SnakeGame_inputConsumed = new WeakMap(), _SnakeGame_bufferedInputConsumed = new WeakMap(), _SnakeGame_renderer = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_isInputProper = function _SnakeGame_isInputProper(input, buffered) {
     let against = buffered ? __classPrivateFieldGet(this, _SnakeGame_input, "f") : __classPrivateFieldGet(this, _SnakeGame_currentDirection, "f");
     if (input == "up" && against == "down") {
         return false;
@@ -265,6 +267,7 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
     __classPrivateFieldSet(this, _SnakeGame_tick, __classPrivateFieldGet(this, _SnakeGame_tick, "f") + 1, "f");
     __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_progress).call(this);
     __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_spawnFruitRandom).call(this);
+    __classPrivateFieldGet(this, _SnakeGame_renderer, "f").update();
     if (__classPrivateFieldGet(this, _SnakeGame_ended, "f")) {
         return;
     }
@@ -352,4 +355,45 @@ export class Mode {
         this.tickMiliseconds = tickMiliseconds;
     }
 }
+class Renderer {
+    constructor(renderingContext, grid) {
+        _Renderer_context.set(this, void 0);
+        _Renderer_grid.set(this, void 0);
+        _Renderer_width.set(this, void 0);
+        _Renderer_height.set(this, void 0);
+        _Renderer_tileWidth.set(this, void 0);
+        _Renderer_tileHeight.set(this, void 0);
+        __classPrivateFieldSet(this, _Renderer_context, renderingContext, "f");
+        __classPrivateFieldSet(this, _Renderer_grid, grid, "f");
+        __classPrivateFieldSet(this, _Renderer_width, renderingContext.canvas.width, "f");
+        __classPrivateFieldSet(this, _Renderer_height, renderingContext.canvas.height, "f");
+        __classPrivateFieldSet(this, _Renderer_tileWidth, __classPrivateFieldGet(this, _Renderer_width, "f") / grid.size, "f");
+        __classPrivateFieldSet(this, _Renderer_tileHeight, __classPrivateFieldGet(this, _Renderer_height, "f") / grid.size, "f");
+    }
+    /**
+     * Redraws the game on CanvasRenderingContext2D used for this object's construction.
+     */
+    update() {
+        __classPrivateFieldGet(this, _Renderer_context, "f").clearRect(0, 0, __classPrivateFieldGet(this, _Renderer_width, "f"), __classPrivateFieldGet(this, _Renderer_height, "f"));
+        for (let x = 0; x < __classPrivateFieldGet(this, _Renderer_grid, "f").size; x++) {
+            for (let y = 0; y < __classPrivateFieldGet(this, _Renderer_grid, "f").size; y++) {
+                switch (__classPrivateFieldGet(this, _Renderer_grid, "f").getTile(new Point(x, y))) {
+                    case EMPTY:
+                        __classPrivateFieldGet(this, _Renderer_context, "f").fillStyle = "white";
+                        break;
+                    case HEAD:
+                        __classPrivateFieldGet(this, _Renderer_context, "f").fillStyle = "green";
+                        break;
+                    case SNAKE:
+                        __classPrivateFieldGet(this, _Renderer_context, "f").fillStyle = "lightgreen";
+                        break;
+                    case FRUIT:
+                        __classPrivateFieldGet(this, _Renderer_context, "f").fillStyle = "red";
+                }
+                __classPrivateFieldGet(this, _Renderer_context, "f").fillRect(x * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), y * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
+            }
+        }
+    }
+}
+_Renderer_context = new WeakMap(), _Renderer_grid = new WeakMap(), _Renderer_width = new WeakMap(), _Renderer_height = new WeakMap(), _Renderer_tileWidth = new WeakMap(), _Renderer_tileHeight = new WeakMap();
 //# sourceMappingURL=SnakeGame.js.map

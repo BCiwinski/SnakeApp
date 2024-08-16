@@ -255,17 +255,20 @@ export class SnakeGame extends EventTarget {
 
     #bufferedInputConsumed: boolean = true;
 
-    constructor(element: HTMLElement, gameMode: Mode) {
+    #renderer: Renderer
+
+    constructor(gameMode: Mode, renderingContext : CanvasRenderingContext2D) {
 
         super();
-
-        this.element = element;
         this.mode = gameMode
 
         this.grid = new Grid(gameMode.size);
         this.snake = new Snake(this.grid);
 
+        this.#renderer = new Renderer(renderingContext, this.grid);
+
         this.#spawnFruitRandom();
+        this.#renderer.update();
     }
 
     /**
@@ -393,6 +396,7 @@ export class SnakeGame extends EventTarget {
         this.#tick += 1;
         this.#progress();
         this.#spawnFruitRandom();
+        this.#renderer.update();
 
         if (this.#ended) {
             return;
@@ -570,5 +574,65 @@ export class Mode {
         this.fruitSpawnNumber = fruitSpawnNumber;
         this.fruitMaxAmount = fruitMaxAmount;
         this.tickMiliseconds = tickMiliseconds;
+    }
+}
+
+class Renderer {
+
+    #context: CanvasRenderingContext2D
+
+    #grid: Grid;
+
+    #width: number;
+
+    #height: number;
+
+    #tileWidth: number;
+
+    #tileHeight: number;
+
+    constructor(renderingContext: CanvasRenderingContext2D, grid: Grid) {
+
+        this.#context = renderingContext;
+        this.#grid = grid;
+
+        this.#width = renderingContext.canvas.width;
+        this.#height = renderingContext.canvas.height;
+
+        this.#tileWidth = this.#width / grid.size;
+        this.#tileHeight = this.#height / grid.size;
+    }
+
+    /**
+     * Redraws the game on CanvasRenderingContext2D used for this object's construction.
+     */
+    update() {
+        this.#context.clearRect(0, 0, this.#width, this.#height);
+
+        for (let x = 0; x < this.#grid.size; x++) {
+
+            for (let y = 0; y < this.#grid.size; y++) {
+
+                switch(this.#grid.getTile(new Point(x, y))){
+
+                    case EMPTY:
+                        this.#context.fillStyle = "white";
+                        break;
+
+                    case HEAD:
+                        this.#context.fillStyle = "green"
+                        break;
+
+                    case SNAKE:
+                        this.#context.fillStyle = "lightgreen";
+                        break;
+
+                    case FRUIT:
+                        this.#context.fillStyle = "red";
+                }
+
+                this.#context.fillRect(x * this.#tileWidth, y * this.#tileHeight, this.#tileWidth, this.#tileHeight);
+            }
+        }
     }
 }

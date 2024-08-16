@@ -5,15 +5,6 @@ var Game: SnakeGame;
 
 var GameEnded: boolean = true;
 
-const HEAD_ATTR = "head";
-const SNAKE_ATTR = "snake";
-const FRUIT_ATTR = "fruit";
-
-const GameObjToAttr = new Map;
-GameObjToAttr.set(1, HEAD_ATTR);
-GameObjToAttr.set(2, SNAKE_ATTR);
-GameObjToAttr.set(3, FRUIT_ATTR);
-
 const leaderboardScores: number = 10;
 let Dialog: HTMLDialogElement;
 let Score: number = 0;
@@ -39,7 +30,7 @@ $(function () {
 
     getLeaderboardScores(leaderboardScores, gameMode.name);
 
-    Game = prepareGame($('#game-grid')[0], gameMode);
+    Game = prepareGame(gameMode);
 
 
     //Add event listener to all gamemode-controlling buttons for changing gamemodes
@@ -65,7 +56,7 @@ $(function () {
 
             getLeaderboardScores(leaderboardScores, gameMode.name);
 
-            Game = prepareGame($('#game-grid')[0], gameMode);
+            Game = prepareGame(gameMode);
         })
     })
 
@@ -103,7 +94,7 @@ $(function () {
 
             if (GameEnded) {
 
-                Game = prepareGame($('#game-grid')[0], gameMode);
+                Game = prepareGame(gameMode);
             }
 
             startGame($('#game-message')[0], Game, 1000);
@@ -132,103 +123,38 @@ function startGame(message: HTMLElement, game: SnakeGame, delayMs: number) : voi
  * @param gameMode - Game mode info.
  * @returns 
  */
-function prepareGame(grid: HTMLElement, gameMode: Mode): SnakeGame{
-
-    removeChildren(grid);
-    generateBoardElements(grid, gameMode.size);
-
-    Game = new SnakeGame(grid, gameMode);
-
-    Game.addEventListener("tick", updateGridElements);
-    Game.addEventListener("victory", finishGameVictory);
-    Game.addEventListener("failure", finishGameFailure);
-
+function prepareGame(gameMode: Mode): SnakeGame{
     
-    updateGridElements();
+    const canvas: HTMLCanvasElement = $("#game-canvas")[0] as HTMLCanvasElement;
+    const context2d = canvas.getContext("2d");
+
+    Game = new SnakeGame(gameMode, context2d);
+
+    Game.addEventListener("tick", onGameTick);
+    Game.addEventListener("victory", onGameVictory);
+    Game.addEventListener("failure", onGameFailure);
 
     GameEnded = false;
 
     return Game;
 }
 
-/**
- * Removes all childeren of a given element.
- * @param element - the element to remove childern of.
- */
-function removeChildren(element : HTMLElement) : void {
-
-    while (element.hasChildNodes()) {
-
-        element.removeChild(element.firstElementChild);
-    }
-}
-
-/**
- * Creates a size^2 <div> elements of class "square" and adds them as chldren to board.
- * @param board - the element to add generated elements to.
- * @param size
- */
-function generateBoardElements(board : HTMLElement, size : number) : void {
-
-    let columns = "auto";
-
-    for (let i = 1; i < size; i++) {
-
-        columns += " auto";
-    }
-
-    board.style.gridTemplateColumns = columns;
-
-    for (let i = 0; i < size * size; i++) {
-
-        let element = document.createElement("div");
-        element.className = "square";
-
-        board.appendChild(element);
-    }
-}
-
-//adds and removes attributes of gridElement's child elements to reflect given gameState
-/**
- * Compares Game's state against children of '#game-grid'. Removes and adds attributes accordingly.
- */
-function updateGridElements() : void {
-
-    let grid: HTMLElement = $('#game-grid')[0];
-
-    for (let i = 0; i < Game.grid.size; i++) {
-
-        for (let j = 0; j < Game.grid.size; j++) {
-
-            const element = getTile(grid, Game.grid.size, new Point(i, j));
-
-            for (let [obj, attr] of GameObjToAttr) {
-
-                element.removeAttribute(attr);
-
-                if (Game.grid.getTile(new Point(i, j)) == obj) {
-
-                    element.setAttribute(attr, "");
-                }
-            }
-        }
-    }
-}
+function onGameTick() { }
 
 /**
  * Finalazes the game when failed and uses '#game-message' for displaying failure message.
  * @param e - CustomEvenet having e.detail of type FailureEventDetail.
  */
-function finishGameFailure(e: CustomEvent) : void {
+function onGameFailure(e: CustomEvent) : void {
 
     let detail: FailureEventDetail = e.detail;
 
     GameEnded = true;
     GameInProgess = false;
 
-    Game.removeEventListener("tick", updateGridElements);
-    Game.removeEventListener("victory", finishGameVictory);
-    Game.removeEventListener("failure", finishGameFailure);
+    Game.removeEventListener("tick", onGameTick);
+    Game.removeEventListener("victory", onGameVictory);
+    Game.removeEventListener("failure", onGameFailure);
 
     let text: string = "Game over";
 
@@ -250,34 +176,22 @@ function finishGameFailure(e: CustomEvent) : void {
  * Shows a dialog for user to submit their score.
  * @param e - CustomEvenet having e.detail of type VictoryEventDetail.
  */
-function finishGameVictory(e: CustomEvent) : void {
+function onGameVictory(e: CustomEvent) : void {
 
     let detail: VictoryEventDetail = e.detail;
 
     GameEnded = true;
     GameInProgess = false;
 
-    Game.removeEventListener("tick", updateGridElements);
-    Game.removeEventListener("victory", finishGameFailure);
-    Game.removeEventListener("failure", finishGameFailure);
+    Game.removeEventListener("tick", onGameTick);
+    Game.removeEventListener("victory", onGameFailure);
+    Game.removeEventListener("failure", onGameFailure);
 
     ($('#game-message')[0] as HTMLElement).innerHTML = `You won with a score of: ${detail.score}, playing: ${detail.gameMode}`;
 
     //Show dialog for user to input their name and submit score
     Score = e.detail.score;
     Dialog.showModal();
-}
-
-/**
- * Returns an element that is in x-column and y-row and a child of grid.
- * @param grid - the element to get the child of.
- * @param size - size of the board.
- * @param position - position of the child element.
- * @returns
- */
-function getTile(grid : HTMLElement, size : number, position: Point) : HTMLElement {
-
-    return grid.childNodes[position.x + position.y * size] as HTMLElement;
 }
 
 /**
