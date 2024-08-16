@@ -81,7 +81,8 @@ function startGame(message, game, delayMs) {
 function prepareGame(gameMode) {
     const canvas = $("#game-canvas")[0];
     const context2d = canvas.getContext("2d");
-    Game = new SnakeGame(gameMode, context2d);
+    const snakeAtlas = $("#game-snake-atlas")[0];
+    Game = new SnakeGame(gameMode, context2d, snakeAtlas);
     Game.addEventListener("tick", onGameTick);
     Game.addEventListener("victory", onGameVictory);
     Game.addEventListener("failure", onGameFailure);

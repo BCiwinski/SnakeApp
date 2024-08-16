@@ -1,4 +1,5 @@
-﻿import {Point, SnakeGame, Direction, Mode, VictoryEventDetail, FailureEventDetail} from "./SnakeGame.js";
+﻿import { Direction } from "./SnakeGameTypes.js";
+import { SnakeGame, Mode, VictoryEventDetail, FailureEventDetail } from "./SnakeGame.js";
 
 var GameInProgess = false;
 var Game: SnakeGame;
@@ -128,7 +129,9 @@ function prepareGame(gameMode: Mode): SnakeGame{
     const canvas: HTMLCanvasElement = $("#game-canvas")[0] as HTMLCanvasElement;
     const context2d = canvas.getContext("2d");
 
-    Game = new SnakeGame(gameMode, context2d);
+    const snakeAtlas: HTMLImageElement = $("#game-snake-atlas")[0] as HTMLImageElement
+
+    Game = new SnakeGame(gameMode, context2d, snakeAtlas);
 
     Game.addEventListener("tick", onGameTick);
     Game.addEventListener("victory", onGameVictory);
