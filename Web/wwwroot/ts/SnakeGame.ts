@@ -251,6 +251,7 @@ export class SnakeGame extends EventTarget {
                 if (this.grid.getTile(point) == EMPTY) {
 
                     result.push(point);
+                    this.#fruitsAmount++;
                     this.grid.setTile(FRUIT, point);
                     break;
                 }

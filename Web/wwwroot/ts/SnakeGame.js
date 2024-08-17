@@ -153,6 +153,7 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
         __classPrivateFieldSet(this, _SnakeGame_fruitsAmount, (_a = __classPrivateFieldGet(this, _SnakeGame_fruitsAmount, "f"), _a--, _a), "f");
     }
 }, _SnakeGame_spawnFruitRandom = function _SnakeGame_spawnFruitRandom() {
+    var _a;
     const result = new Array();
     for (let i = 0; i < this.mode.fruitSpawnNumber && (__classPrivateFieldGet(this, _SnakeGame_fruitsAmount, "f") < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
         let rand = Math.random() * this.mode.fruitSpawnChance;
@@ -165,6 +166,7 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
             let point = new Point(rand_x, rand_y);
             if (this.grid.getTile(point) == EMPTY) {
                 result.push(point);
+                __classPrivateFieldSet(this, _SnakeGame_fruitsAmount, (_a = __classPrivateFieldGet(this, _SnakeGame_fruitsAmount, "f"), _a++, _a), "f");
                 this.grid.setTile(FRUIT, point);
                 break;
             }
