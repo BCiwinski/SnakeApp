@@ -25,9 +25,9 @@
      inkscape:document-units="px"
      showguides="true"
      inkscape:lockguides="false"
-     inkscape:zoom="32"
-     inkscape:cx="5.421875"
-     inkscape:cy="42.265625"
+     inkscape:zoom="16"
+     inkscape:cx="25.21875"
+     inkscape:cy="18.59375"
      inkscape:window-width="1920"
      inkscape:window-height="1001"
      inkscape:window-x="-9"
@@ -54,6 +54,48 @@
        id="guide3"
        inkscape:locked="false"
        inkscape:label=""
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="0,90"
+       orientation="0,1"
+       id="guide4"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="0,80"
+       orientation="0,1"
+       id="guide5"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="0,70"
+       orientation="0,1"
+       id="guide6"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="20,100"
+       orientation="-1,0"
+       id="guide7"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="30,100"
+       orientation="-1,0"
+       id="guide8"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="40,100"
+       orientation="-1,0"
+       id="guide9"
+       inkscape:label=""
+       inkscape:locked="false"
        inkscape:color="rgb(0,134,229)" />
   </sodipodi:namedview>
   <defs
@@ -467,7 +509,8 @@
      id="layer8-7"
      inkscape:label="Turn2"
      mask="url(#mask25-3)"
-     transform="rotate(180,20,15)">
+     transform="rotate(180,20,15)"
+     style="display:inline">
     <path
        style="fill:#41d04d;fill-opacity:0.984314;stroke:#000000;stroke-width:0.264583;stroke-opacity:1"
        d="m 10,8.0000003 c 1.25688,0 2.016536,0.7763018 2,1.9999997 0,1.028589 0,2 0,2 h 6 V 10 C 18,5.0681417 14.911349,2.0000002 10,2.0000002 H 5.920052 l -3e-7,6.0214263 c 0,0 2.9058598,-0.021426 4.0799483,-0.021426 z"
@@ -479,7 +522,8 @@
      id="layer8-5"
      inkscape:label="Turn3"
      mask="url(#mask25-6)"
-     transform="rotate(90,15,25)">
+     transform="rotate(90,15,25)"
+     style="display:inline">
     <path
        style="fill:#41d04d;fill-opacity:0.984314;stroke:#000000;stroke-width:0.264583;stroke-opacity:1"
        d="m 10,8.0000003 c 1.25688,0 2.016536,0.7763018 2,1.9999997 0,1.028589 0,2 0,2 h 6 V 10 C 18,5.0681417 14.911349,2.0000002 10,2.0000002 H 5.920052 l -3e-7,6.0214263 c 0,0 2.9058598,-0.021426 4.0799483,-0.021426 z"
