@@ -190,8 +190,6 @@ export default class Renderer {
         let head: Point = this.#snake.head;
         let next: Point = this.#snake.body[this.#snake.length() - 1];
 
-        this.#clearTile(head);
-
         let orientation: StraightOrientation = this.#getStraightOrientation(next, head);
 
         if (orientation == "invalid") {

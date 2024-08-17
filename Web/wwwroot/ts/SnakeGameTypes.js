@@ -114,19 +114,19 @@ export class Snake {
      * @returns
      */
     move(direction) {
-        let ateFruit = false;
+        let result = "ok";
         const oldHeadPos = new Point(this.head.x, this.head.y);
         const newHeadPos = this.grid.getPositionInDirection(this.head, direction);
         if (this.grid.isOutside(newHeadPos)) {
             return "isOutside";
         }
         if (__classPrivateFieldGet(this, _Snake_instances, "m", _Snake_bitSelf).call(this, newHeadPos) && !(newHeadPos.equals(this.end))) {
-            return "bitSelf";
+            result = "bitSelf";
         }
         this.body.push(oldHeadPos);
         //see if snake's head will be on a tile containing fruit
         if (this.grid.getTile(newHeadPos) == FRUIT) {
-            ateFruit = true;
+            result = "ateFruit";
         }
         else {
             //if snake wont be eating a fruit, move his end (remove one part)
@@ -139,10 +139,7 @@ export class Snake {
         this.grid.setTile(HEAD, newHeadPos);
         //part of his body follows where his head was
         this.grid.setTile(SNAKE, oldHeadPos);
-        if (ateFruit) {
-            return "ateFruit";
-        }
-        return "ok";
+        return result;
     }
     /**
      * Gives current length of the snake, including its head.

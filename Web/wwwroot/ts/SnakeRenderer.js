@@ -111,7 +111,6 @@ _Renderer_context = new WeakMap(), _Renderer_grid = new WeakMap(), _Renderer_wid
 }, _Renderer_drawHead = function _Renderer_drawHead() {
     let head = __classPrivateFieldGet(this, _Renderer_snake, "f").head;
     let next = __classPrivateFieldGet(this, _Renderer_snake, "f").body[__classPrivateFieldGet(this, _Renderer_snake, "f").length() - 1];
-    __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_clearTile).call(this, head);
     let orientation = __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_getStraightOrientation).call(this, next, head);
     if (orientation == "invalid") {
         throw "Error getting orientation in SnakeRenderer.#drawHead()";

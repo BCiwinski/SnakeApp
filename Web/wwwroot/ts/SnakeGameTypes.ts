@@ -163,7 +163,7 @@ export class Snake {
      */
     move(direction: Direction): SnakeMoveResult {
 
-        let ateFruit: boolean = false;
+        let result: SnakeMoveResult = "ok";
 
         const oldHeadPos: Point = new Point(this.head.x, this.head.y);
         const newHeadPos: Point = this.grid.getPositionInDirection(this.head, direction);
@@ -173,15 +173,15 @@ export class Snake {
         }
 
         if (this.#bitSelf(newHeadPos) && !(newHeadPos.equals(this.end))) {
-            return "bitSelf";
+            result = "bitSelf";
         }
 
         this.body.push(oldHeadPos);
 
         //see if snake's head will be on a tile containing fruit
         if (this.grid.getTile(newHeadPos) == FRUIT) {
-
-            ateFruit = true;
+            
+            result = "ateFruit";
         }
         else {
 
@@ -198,11 +198,7 @@ export class Snake {
         //part of his body follows where his head was
         this.grid.setTile(SNAKE, oldHeadPos);
 
-        if (ateFruit) {
-            return "ateFruit";
-        }
-
-        return "ok";
+        return result;
     }
 
     /**
