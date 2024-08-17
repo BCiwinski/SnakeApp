@@ -103,7 +103,8 @@ export class Snake {
         this.body = new Array;
         this.end = new Point(0, 0);
         this.body.push(this.end);
-        this.head = new Point(0, 1);
+        this.body.push(new Point(0, 1));
+        this.head = new Point(0, 2);
         this.body.forEach(function (value) { grid.setTile(SNAKE, value); });
         grid.setTile(HEAD, this.head);
     }
