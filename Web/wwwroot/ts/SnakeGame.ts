@@ -22,7 +22,7 @@ export class SnakeGame extends EventTarget {
 
     #inProgress: boolean = false;
 
-    #fruits: Array<Point>
+    #fruitsAmount: number = 0;
 
     mode: Mode
 
@@ -45,9 +45,8 @@ export class SnakeGame extends EventTarget {
 
         this.grid = new Grid(gameMode.size);
         this.snake = new Snake(this.grid);
-        this.#fruits = new Array<Point>();
 
-        this.#renderer = new Renderer(renderingContext, this.snake, atlas, this.#fruits, this.grid);
+        this.#renderer = new Renderer(renderingContext, this.snake, atlas, this.grid);
 
         this.#spawnFruitRandom();
         this.#renderer.update();
@@ -177,7 +176,9 @@ export class SnakeGame extends EventTarget {
 
         this.#tick += 1;
         this.#progress();
-        this.#spawnFruitRandom();
+        const fruits: Array<Point> = this.#spawnFruitRandom();
+
+        this.#renderer.addFruits(fruits);
         this.#renderer.update();
 
         if (this.#ended) {
@@ -221,19 +222,18 @@ export class SnakeGame extends EventTarget {
 
         if (result == "ateFruit") {
 
-            const toRemove = this.#fruits.find(p => p.equals(this.snake.head))
-            const index = this.#fruits.indexOf(toRemove);
-            this.#fruits[index] = this.#fruits[this.#fruits.length - 1];
-            this.#fruits.pop();
+            this.#fruitsAmount--;
         }
     }
 
     /**
      * Spawns fruits using random number generator and values from Mode.
      */
-    #spawnFruitRandom(): void {
+    #spawnFruitRandom(): Array<Point> {
 
-        for (let i = 0; i < this.mode.fruitSpawnNumber && (this.#fruits.length < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
+        const result: Array<Point> = new Array<Point>();
+
+        for (let i = 0; i < this.mode.fruitSpawnNumber && (this.#fruitsAmount < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
 
             let rand = Math.random() * this.mode.fruitSpawnChance;
 
@@ -250,13 +250,15 @@ export class SnakeGame extends EventTarget {
 
                 if (this.grid.getTile(point) == EMPTY) {
 
-                    this.#fruits.push(point);
+                    result.push(point);
                     this.grid.setTile(FRUIT, point);
                     break;
                 }
 
             }
         }
+
+        return result;
     }
 
     /**

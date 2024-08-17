@@ -50,12 +50,16 @@ export default class Renderer {
 
     #fruits: Array<Point>;
 
-    constructor(renderingContext: CanvasRenderingContext2D, snake: Snake, snakeAtlas: HTMLImageElement, fruits: Array<Point>, grid: Grid) {
+    #snakeEndBefore: Point;
+
+    constructor(renderingContext: CanvasRenderingContext2D, snake: Snake, snakeAtlas: HTMLImageElement, grid: Grid) {
+
+        this.#snakeEndBefore = snake.end;
 
         this.#snake = snake;
         this.#atlas = snakeAtlas;
 
-        this.#fruits = fruits;
+        this.#fruits = new Array<Point>();
 
         this.#context = renderingContext;
         this.#grid = grid;
@@ -65,20 +69,26 @@ export default class Renderer {
 
         this.#tileWidth = this.#width / grid.size;
         this.#tileHeight = this.#height / grid.size;
+
+        //clear everything
+        this.#context.clearRect(0, 0, this.#width, this.#height);
     }
 
     /**
      * Redraws the game on CanvasRenderingContext2D used for this object's construction.
      */
     update() {
-        this.#context.clearRect(0, 0, this.#width, this.#height);
 
         this.#drawFruits();
 
-        //draw snake
         this.#drawTail();
         this.#drawBody();
         this.#drawHead();
+    }
+
+    addFruits(fruits: Array<Point>) {
+
+        this.#fruits = fruits;
     }
 
     #drawFruits() {
@@ -98,12 +108,17 @@ export default class Renderer {
                 this.#tileWidth,
                 this.#tileHeight);
         });
+
+        this.#fruits = new Array<Point>();
     }
 
     #drawTail() {
 
         let pos: Point = this.#snake.body[0];
         let previous: Point;
+
+        this.#clearTile(this.#snakeEndBefore);
+        this.#clearTile(pos);
 
         if (this.#snake.length() == 1) {
 
@@ -133,43 +148,51 @@ export default class Renderer {
             pos.y * this.#tileWidth,
             this.#tileWidth,
             this.#tileHeight);
+
+        this.#snakeEndBefore = pos;
     }
 
     #drawBody() {
 
-        let previous: Point;
-        let pos: Point = this.#snake.head;
-        let next: Point = this.#snake.body[this.#snake.length() - 1];
-
-        for (let i = this.#snake.length() - 1; i >= 1; i--) {
-
-            previous = pos;
-            pos = next;
-            next = this.#snake.body[i - 1];
-
-            const orientation = this.#getOrientation(pos, previous, next);
-            const atlasPos = BodyOrientationToAtlasPos.get(orientation);
-
-            this.#context.drawImage(
-                this.#atlas,
-                atlasPos.x * SpriteSize,
-                atlasPos.y * SpriteSize,
-                SpriteSize,
-                SpriteSize,
-                pos.x * this.#tileHeight,
-                pos.y * this.#tileWidth,
-                this.#tileWidth,
-                this.#tileHeight);
-
+        if (this.#snake.length() < 2) {
+            return;
         }
+
+        let previous: Point = this.#snake.head;
+        let pos: Point = this.#snake.body[this.#snake.length() - 1];
+        let next: Point = this.#snake.body[this.#snake.length() - 2];
+
+        this.#clearTile(pos);
+
+        let orientation: Orientation = this.#getOrientation(pos, previous, next)
+
+        if (orientation == "invalid") {
+
+            throw "Error getting orientation in SnakeRenderer.#drawBody()";
+        }
+
+        let atlasPos = BodyOrientationToAtlasPos.get(orientation);
+
+        this.#context.drawImage(
+            this.#atlas,
+            atlasPos.x * SpriteSize,
+            atlasPos.y * SpriteSize,
+            SpriteSize,
+            SpriteSize,
+            pos.x * this.#tileHeight,
+            pos.y * this.#tileWidth,
+            this.#tileWidth,
+            this.#tileHeight);
     }
 
     #drawHead() {
 
-        let pos: Point = this.#snake.head;
+        let head: Point = this.#snake.head;
         let next: Point = this.#snake.body[this.#snake.length() - 1];
 
-        let orientation: StraightOrientation = this.#getStraightOrientation(next, pos);
+        this.#clearTile(head);
+
+        let orientation: StraightOrientation = this.#getStraightOrientation(next, head);
 
         if (orientation == "invalid") {
 
@@ -184,8 +207,8 @@ export default class Renderer {
             atlasPos.y * SpriteSize,
             SpriteSize,
             SpriteSize,
-            pos.x * this.#tileHeight,
-            pos.y * this.#tileWidth,
+            head.x * this.#tileHeight,
+            head.y * this.#tileWidth,
             this.#tileWidth,
             this.#tileHeight);
     }
@@ -282,5 +305,15 @@ export default class Renderer {
         }
 
         return result;
+    }
+
+    #clearTile(position: Point) : void {
+
+        this.#context.clearRect(
+            position.x * this.#tileWidth,
+            position.y * this.#tileHeight,
+            this.#tileHeight,
+            this.#tileHeight
+        );
     }
 }

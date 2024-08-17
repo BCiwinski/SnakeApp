@@ -9,7 +9,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Renderer_instances, _Renderer_context, _Renderer_grid, _Renderer_width, _Renderer_height, _Renderer_tileWidth, _Renderer_tileHeight, _Renderer_snake, _Renderer_atlas, _Renderer_fruits, _Renderer_drawFruits, _Renderer_drawTail, _Renderer_drawBody, _Renderer_drawHead, _Renderer_getOrientation, _Renderer_getStraightOrientation;
+var _Renderer_instances, _Renderer_context, _Renderer_grid, _Renderer_width, _Renderer_height, _Renderer_tileWidth, _Renderer_tileHeight, _Renderer_snake, _Renderer_atlas, _Renderer_fruits, _Renderer_snakeEndBefore, _Renderer_drawFruits, _Renderer_drawTail, _Renderer_drawBody, _Renderer_drawHead, _Renderer_getOrientation, _Renderer_getStraightOrientation, _Renderer_clearTile;
 import { Point } from "./SnakeGameTypes.js";
 const SpriteSize = 10;
 const TailOrientationToAtlasPos = new Map();
@@ -32,7 +32,7 @@ HeadOrientationToAtlasPos.set("downToUp", new Point(1, 0));
 HeadOrientationToAtlasPos.set("rightToLeft", new Point(2, 0));
 HeadOrientationToAtlasPos.set("upToDown", new Point(3, 0));
 class Renderer {
-    constructor(renderingContext, snake, snakeAtlas, fruits, grid) {
+    constructor(renderingContext, snake, snakeAtlas, grid) {
         _Renderer_instances.add(this);
         _Renderer_context.set(this, void 0);
         _Renderer_grid.set(this, void 0);
@@ -43,36 +43,44 @@ class Renderer {
         _Renderer_snake.set(this, void 0);
         _Renderer_atlas.set(this, void 0);
         _Renderer_fruits.set(this, void 0);
+        _Renderer_snakeEndBefore.set(this, void 0);
+        __classPrivateFieldSet(this, _Renderer_snakeEndBefore, snake.end, "f");
         __classPrivateFieldSet(this, _Renderer_snake, snake, "f");
         __classPrivateFieldSet(this, _Renderer_atlas, snakeAtlas, "f");
-        __classPrivateFieldSet(this, _Renderer_fruits, fruits, "f");
+        __classPrivateFieldSet(this, _Renderer_fruits, new Array(), "f");
         __classPrivateFieldSet(this, _Renderer_context, renderingContext, "f");
         __classPrivateFieldSet(this, _Renderer_grid, grid, "f");
         __classPrivateFieldSet(this, _Renderer_width, renderingContext.canvas.width, "f");
         __classPrivateFieldSet(this, _Renderer_height, renderingContext.canvas.height, "f");
         __classPrivateFieldSet(this, _Renderer_tileWidth, __classPrivateFieldGet(this, _Renderer_width, "f") / grid.size, "f");
         __classPrivateFieldSet(this, _Renderer_tileHeight, __classPrivateFieldGet(this, _Renderer_height, "f") / grid.size, "f");
+        //clear everything
+        __classPrivateFieldGet(this, _Renderer_context, "f").clearRect(0, 0, __classPrivateFieldGet(this, _Renderer_width, "f"), __classPrivateFieldGet(this, _Renderer_height, "f"));
     }
     /**
      * Redraws the game on CanvasRenderingContext2D used for this object's construction.
      */
     update() {
-        __classPrivateFieldGet(this, _Renderer_context, "f").clearRect(0, 0, __classPrivateFieldGet(this, _Renderer_width, "f"), __classPrivateFieldGet(this, _Renderer_height, "f"));
         __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_drawFruits).call(this);
-        //draw snake
         __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_drawTail).call(this);
         __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_drawBody).call(this);
         __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_drawHead).call(this);
     }
+    addFruits(fruits) {
+        __classPrivateFieldSet(this, _Renderer_fruits, fruits, "f");
+    }
 }
-_Renderer_context = new WeakMap(), _Renderer_grid = new WeakMap(), _Renderer_width = new WeakMap(), _Renderer_height = new WeakMap(), _Renderer_tileWidth = new WeakMap(), _Renderer_tileHeight = new WeakMap(), _Renderer_snake = new WeakMap(), _Renderer_atlas = new WeakMap(), _Renderer_fruits = new WeakMap(), _Renderer_instances = new WeakSet(), _Renderer_drawFruits = function _Renderer_drawFruits() {
+_Renderer_context = new WeakMap(), _Renderer_grid = new WeakMap(), _Renderer_width = new WeakMap(), _Renderer_height = new WeakMap(), _Renderer_tileWidth = new WeakMap(), _Renderer_tileHeight = new WeakMap(), _Renderer_snake = new WeakMap(), _Renderer_atlas = new WeakMap(), _Renderer_fruits = new WeakMap(), _Renderer_snakeEndBefore = new WeakMap(), _Renderer_instances = new WeakSet(), _Renderer_drawFruits = function _Renderer_drawFruits() {
     __classPrivateFieldGet(this, _Renderer_fruits, "f").forEach(f => {
         let atlasPos = new Point(0, 4);
         __classPrivateFieldGet(this, _Renderer_context, "f").drawImage(__classPrivateFieldGet(this, _Renderer_atlas, "f"), atlasPos.x * SpriteSize, atlasPos.y * SpriteSize, SpriteSize, SpriteSize, f.x * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), f.y * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
     });
+    __classPrivateFieldSet(this, _Renderer_fruits, new Array(), "f");
 }, _Renderer_drawTail = function _Renderer_drawTail() {
     let pos = __classPrivateFieldGet(this, _Renderer_snake, "f").body[0];
     let previous;
+    __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_clearTile).call(this, __classPrivateFieldGet(this, _Renderer_snakeEndBefore, "f"));
+    __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_clearTile).call(this, pos);
     if (__classPrivateFieldGet(this, _Renderer_snake, "f").length() == 1) {
         previous = __classPrivateFieldGet(this, _Renderer_snake, "f").head;
     }
@@ -85,27 +93,31 @@ _Renderer_context = new WeakMap(), _Renderer_grid = new WeakMap(), _Renderer_wid
     }
     let atlasPos = TailOrientationToAtlasPos.get(orientation);
     __classPrivateFieldGet(this, _Renderer_context, "f").drawImage(__classPrivateFieldGet(this, _Renderer_atlas, "f"), atlasPos.x * SpriteSize, atlasPos.y * SpriteSize, SpriteSize, SpriteSize, pos.x * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), pos.y * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
+    __classPrivateFieldSet(this, _Renderer_snakeEndBefore, pos, "f");
 }, _Renderer_drawBody = function _Renderer_drawBody() {
-    let previous;
-    let pos = __classPrivateFieldGet(this, _Renderer_snake, "f").head;
-    let next = __classPrivateFieldGet(this, _Renderer_snake, "f").body[__classPrivateFieldGet(this, _Renderer_snake, "f").length() - 1];
-    for (let i = __classPrivateFieldGet(this, _Renderer_snake, "f").length() - 1; i >= 1; i--) {
-        previous = pos;
-        pos = next;
-        next = __classPrivateFieldGet(this, _Renderer_snake, "f").body[i - 1];
-        const orientation = __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_getOrientation).call(this, pos, previous, next);
-        const atlasPos = BodyOrientationToAtlasPos.get(orientation);
-        __classPrivateFieldGet(this, _Renderer_context, "f").drawImage(__classPrivateFieldGet(this, _Renderer_atlas, "f"), atlasPos.x * SpriteSize, atlasPos.y * SpriteSize, SpriteSize, SpriteSize, pos.x * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), pos.y * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
+    if (__classPrivateFieldGet(this, _Renderer_snake, "f").length() < 2) {
+        return;
     }
+    let previous = __classPrivateFieldGet(this, _Renderer_snake, "f").head;
+    let pos = __classPrivateFieldGet(this, _Renderer_snake, "f").body[__classPrivateFieldGet(this, _Renderer_snake, "f").length() - 1];
+    let next = __classPrivateFieldGet(this, _Renderer_snake, "f").body[__classPrivateFieldGet(this, _Renderer_snake, "f").length() - 2];
+    __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_clearTile).call(this, pos);
+    let orientation = __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_getOrientation).call(this, pos, previous, next);
+    if (orientation == "invalid") {
+        throw "Error getting orientation in SnakeRenderer.#drawBody()";
+    }
+    let atlasPos = BodyOrientationToAtlasPos.get(orientation);
+    __classPrivateFieldGet(this, _Renderer_context, "f").drawImage(__classPrivateFieldGet(this, _Renderer_atlas, "f"), atlasPos.x * SpriteSize, atlasPos.y * SpriteSize, SpriteSize, SpriteSize, pos.x * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), pos.y * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
 }, _Renderer_drawHead = function _Renderer_drawHead() {
-    let pos = __classPrivateFieldGet(this, _Renderer_snake, "f").head;
+    let head = __classPrivateFieldGet(this, _Renderer_snake, "f").head;
     let next = __classPrivateFieldGet(this, _Renderer_snake, "f").body[__classPrivateFieldGet(this, _Renderer_snake, "f").length() - 1];
-    let orientation = __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_getStraightOrientation).call(this, next, pos);
+    __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_clearTile).call(this, head);
+    let orientation = __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_getStraightOrientation).call(this, next, head);
     if (orientation == "invalid") {
         throw "Error getting orientation in SnakeRenderer.#drawHead()";
     }
     let atlasPos = HeadOrientationToAtlasPos.get(orientation);
-    __classPrivateFieldGet(this, _Renderer_context, "f").drawImage(__classPrivateFieldGet(this, _Renderer_atlas, "f"), atlasPos.x * SpriteSize, atlasPos.y * SpriteSize, SpriteSize, SpriteSize, pos.x * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), pos.y * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
+    __classPrivateFieldGet(this, _Renderer_context, "f").drawImage(__classPrivateFieldGet(this, _Renderer_atlas, "f"), atlasPos.x * SpriteSize, atlasPos.y * SpriteSize, SpriteSize, SpriteSize, head.x * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), head.y * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
 }, _Renderer_getOrientation = function _Renderer_getOrientation(of, previous, next) {
     const previousStraight = __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_getStraightOrientation).call(this, of, previous);
     const nextStraight = __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_getStraightOrientation).call(this, next, of);
@@ -165,6 +177,8 @@ _Renderer_context = new WeakMap(), _Renderer_grid = new WeakMap(), _Renderer_wid
         result = "upToDown";
     }
     return result;
+}, _Renderer_clearTile = function _Renderer_clearTile(position) {
+    __classPrivateFieldGet(this, _Renderer_context, "f").clearRect(position.x * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), position.y * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
 };
 export default Renderer;
 //# sourceMappingURL=SnakeRenderer.js.map

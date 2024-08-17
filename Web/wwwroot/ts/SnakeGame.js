@@ -9,7 +9,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _SnakeGame_instances, _SnakeGame_tick, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_fruits, _SnakeGame_currentDirection, _SnakeGame_input, _SnakeGame_bufferedInput, _SnakeGame_inputConsumed, _SnakeGame_bufferedInputConsumed, _SnakeGame_renderer, _SnakeGame_isInputProper, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_score;
+var _SnakeGame_instances, _SnakeGame_tick, _SnakeGame_ended, _SnakeGame_inProgress, _SnakeGame_fruitsAmount, _SnakeGame_currentDirection, _SnakeGame_input, _SnakeGame_bufferedInput, _SnakeGame_inputConsumed, _SnakeGame_bufferedInputConsumed, _SnakeGame_renderer, _SnakeGame_isInputProper, _SnakeGame_gameTick, _SnakeGame_progress, _SnakeGame_spawnFruitRandom, _SnakeGame_isWon, _SnakeGame_score;
 import { Point, Grid, Snake } from "./SnakeGameTypes.js";
 import Renderer from "./SnakeRenderer.js";
 const EMPTY = 0;
@@ -24,7 +24,7 @@ export class SnakeGame extends EventTarget {
         _SnakeGame_tick.set(this, 0);
         _SnakeGame_ended.set(this, false);
         _SnakeGame_inProgress.set(this, false);
-        _SnakeGame_fruits.set(this, void 0);
+        _SnakeGame_fruitsAmount.set(this, 0);
         _SnakeGame_currentDirection.set(this, "down");
         _SnakeGame_input.set(this, "down");
         _SnakeGame_bufferedInput.set(this, "down");
@@ -34,8 +34,7 @@ export class SnakeGame extends EventTarget {
         this.mode = gameMode;
         this.grid = new Grid(gameMode.size);
         this.snake = new Snake(this.grid);
-        __classPrivateFieldSet(this, _SnakeGame_fruits, new Array(), "f");
-        __classPrivateFieldSet(this, _SnakeGame_renderer, new Renderer(renderingContext, this.snake, atlas, __classPrivateFieldGet(this, _SnakeGame_fruits, "f"), this.grid), "f");
+        __classPrivateFieldSet(this, _SnakeGame_renderer, new Renderer(renderingContext, this.snake, atlas, this.grid), "f");
         __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_spawnFruitRandom).call(this);
         __classPrivateFieldGet(this, _SnakeGame_renderer, "f").update();
     }
@@ -95,7 +94,7 @@ export class SnakeGame extends EventTarget {
         }
     }
 }
-_SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_fruits = new WeakMap(), _SnakeGame_currentDirection = new WeakMap(), _SnakeGame_input = new WeakMap(), _SnakeGame_bufferedInput = new WeakMap(), _SnakeGame_inputConsumed = new WeakMap(), _SnakeGame_bufferedInputConsumed = new WeakMap(), _SnakeGame_renderer = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_isInputProper = function _SnakeGame_isInputProper(input, buffered) {
+_SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_inProgress = new WeakMap(), _SnakeGame_fruitsAmount = new WeakMap(), _SnakeGame_currentDirection = new WeakMap(), _SnakeGame_input = new WeakMap(), _SnakeGame_bufferedInput = new WeakMap(), _SnakeGame_inputConsumed = new WeakMap(), _SnakeGame_bufferedInputConsumed = new WeakMap(), _SnakeGame_renderer = new WeakMap(), _SnakeGame_instances = new WeakSet(), _SnakeGame_isInputProper = function _SnakeGame_isInputProper(input, buffered) {
     let against = buffered ? __classPrivateFieldGet(this, _SnakeGame_input, "f") : __classPrivateFieldGet(this, _SnakeGame_currentDirection, "f");
     if (input == "up" && against == "down") {
         return false;
@@ -122,7 +121,8 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
     }
     __classPrivateFieldSet(this, _SnakeGame_tick, __classPrivateFieldGet(this, _SnakeGame_tick, "f") + 1, "f");
     __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_progress).call(this);
-    __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_spawnFruitRandom).call(this);
+    const fruits = __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_spawnFruitRandom).call(this);
+    __classPrivateFieldGet(this, _SnakeGame_renderer, "f").addFruits(fruits);
     __classPrivateFieldGet(this, _SnakeGame_renderer, "f").update();
     if (__classPrivateFieldGet(this, _SnakeGame_ended, "f")) {
         return;
@@ -131,6 +131,7 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
     new Promise(resolve => setTimeout(resolve, this.mode.tickMiliseconds)).then(() => { __classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_gameTick).call(this); });
     this.dispatchEvent(this.tick);
 }, _SnakeGame_progress = function _SnakeGame_progress() {
+    var _a;
     if (__classPrivateFieldGet(this, _SnakeGame_instances, "m", _SnakeGame_isWon).call(this)) {
         __classPrivateFieldSet(this, _SnakeGame_ended, true, "f");
         __classPrivateFieldSet(this, _SnakeGame_inProgress, false, "f");
@@ -149,13 +150,11 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
         this.dispatchEvent(new CustomEvent("failure", { detail: new FailureEventDetail("bitSelf") }));
     }
     if (result == "ateFruit") {
-        const toRemove = __classPrivateFieldGet(this, _SnakeGame_fruits, "f").find(p => p.equals(this.snake.head));
-        const index = __classPrivateFieldGet(this, _SnakeGame_fruits, "f").indexOf(toRemove);
-        __classPrivateFieldGet(this, _SnakeGame_fruits, "f")[index] = __classPrivateFieldGet(this, _SnakeGame_fruits, "f")[__classPrivateFieldGet(this, _SnakeGame_fruits, "f").length - 1];
-        __classPrivateFieldGet(this, _SnakeGame_fruits, "f").pop();
+        __classPrivateFieldSet(this, _SnakeGame_fruitsAmount, (_a = __classPrivateFieldGet(this, _SnakeGame_fruitsAmount, "f"), _a--, _a), "f");
     }
 }, _SnakeGame_spawnFruitRandom = function _SnakeGame_spawnFruitRandom() {
-    for (let i = 0; i < this.mode.fruitSpawnNumber && (__classPrivateFieldGet(this, _SnakeGame_fruits, "f").length < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
+    const result = new Array();
+    for (let i = 0; i < this.mode.fruitSpawnNumber && (__classPrivateFieldGet(this, _SnakeGame_fruitsAmount, "f") < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
         let rand = Math.random() * this.mode.fruitSpawnChance;
         if (rand > 1.0) {
             continue;
@@ -165,12 +164,13 @@ _SnakeGame_tick = new WeakMap(), _SnakeGame_ended = new WeakMap(), _SnakeGame_in
             let rand_y = Math.round(Math.random() * (this.grid.size - 1));
             let point = new Point(rand_x, rand_y);
             if (this.grid.getTile(point) == EMPTY) {
-                __classPrivateFieldGet(this, _SnakeGame_fruits, "f").push(point);
+                result.push(point);
                 this.grid.setTile(FRUIT, point);
                 break;
             }
         }
     }
+    return result;
 }, _SnakeGame_isWon = function _SnakeGame_isWon() {
     for (let i = 0; i < this.grid.size; i++) {
         for (let j = 0; j < this.grid.size; j++) {
