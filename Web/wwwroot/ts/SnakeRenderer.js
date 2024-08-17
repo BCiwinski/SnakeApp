@@ -9,7 +9,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Renderer_instances, _Renderer_context, _Renderer_grid, _Renderer_width, _Renderer_height, _Renderer_tileWidth, _Renderer_tileHeight, _Renderer_snake, _Renderer_atlas, _Renderer_drawTail, _Renderer_drawBody, _Renderer_drawHead, _Renderer_getOrientation, _Renderer_getStraightOrientation;
+var _Renderer_instances, _Renderer_context, _Renderer_grid, _Renderer_width, _Renderer_height, _Renderer_tileWidth, _Renderer_tileHeight, _Renderer_snake, _Renderer_atlas, _Renderer_fruits, _Renderer_drawFruits, _Renderer_drawTail, _Renderer_drawBody, _Renderer_drawHead, _Renderer_getOrientation, _Renderer_getStraightOrientation;
 import { Point } from "./SnakeGameTypes.js";
 const SpriteSize = 10;
 const TailOrientationToAtlasPos = new Map();
@@ -32,7 +32,7 @@ HeadOrientationToAtlasPos.set("downToUp", new Point(1, 0));
 HeadOrientationToAtlasPos.set("rightToLeft", new Point(2, 0));
 HeadOrientationToAtlasPos.set("upToDown", new Point(3, 0));
 class Renderer {
-    constructor(renderingContext, snake, snakeAtlas, grid) {
+    constructor(renderingContext, snake, snakeAtlas, fruits, grid) {
         _Renderer_instances.add(this);
         _Renderer_context.set(this, void 0);
         _Renderer_grid.set(this, void 0);
@@ -42,8 +42,10 @@ class Renderer {
         _Renderer_tileHeight.set(this, void 0);
         _Renderer_snake.set(this, void 0);
         _Renderer_atlas.set(this, void 0);
+        _Renderer_fruits.set(this, void 0);
         __classPrivateFieldSet(this, _Renderer_snake, snake, "f");
         __classPrivateFieldSet(this, _Renderer_atlas, snakeAtlas, "f");
+        __classPrivateFieldSet(this, _Renderer_fruits, fruits, "f");
         __classPrivateFieldSet(this, _Renderer_context, renderingContext, "f");
         __classPrivateFieldSet(this, _Renderer_grid, grid, "f");
         __classPrivateFieldSet(this, _Renderer_width, renderingContext.canvas.width, "f");
@@ -56,12 +58,19 @@ class Renderer {
      */
     update() {
         __classPrivateFieldGet(this, _Renderer_context, "f").clearRect(0, 0, __classPrivateFieldGet(this, _Renderer_width, "f"), __classPrivateFieldGet(this, _Renderer_height, "f"));
+        __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_drawFruits).call(this);
+        //draw snake
         __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_drawTail).call(this);
         __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_drawBody).call(this);
         __classPrivateFieldGet(this, _Renderer_instances, "m", _Renderer_drawHead).call(this);
     }
 }
-_Renderer_context = new WeakMap(), _Renderer_grid = new WeakMap(), _Renderer_width = new WeakMap(), _Renderer_height = new WeakMap(), _Renderer_tileWidth = new WeakMap(), _Renderer_tileHeight = new WeakMap(), _Renderer_snake = new WeakMap(), _Renderer_atlas = new WeakMap(), _Renderer_instances = new WeakSet(), _Renderer_drawTail = function _Renderer_drawTail() {
+_Renderer_context = new WeakMap(), _Renderer_grid = new WeakMap(), _Renderer_width = new WeakMap(), _Renderer_height = new WeakMap(), _Renderer_tileWidth = new WeakMap(), _Renderer_tileHeight = new WeakMap(), _Renderer_snake = new WeakMap(), _Renderer_atlas = new WeakMap(), _Renderer_fruits = new WeakMap(), _Renderer_instances = new WeakSet(), _Renderer_drawFruits = function _Renderer_drawFruits() {
+    __classPrivateFieldGet(this, _Renderer_fruits, "f").forEach(f => {
+        let atlasPos = new Point(0, 4);
+        __classPrivateFieldGet(this, _Renderer_context, "f").drawImage(__classPrivateFieldGet(this, _Renderer_atlas, "f"), atlasPos.x * SpriteSize, atlasPos.y * SpriteSize, SpriteSize, SpriteSize, f.x * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), f.y * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
+    });
+}, _Renderer_drawTail = function _Renderer_drawTail() {
     let pos = __classPrivateFieldGet(this, _Renderer_snake, "f").body[0];
     let previous;
     if (__classPrivateFieldGet(this, _Renderer_snake, "f").length() == 1) {

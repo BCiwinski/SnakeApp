@@ -22,7 +22,7 @@ export class SnakeGame extends EventTarget {
 
     #inProgress: boolean = false;
 
-    #fruitAmount: number = 0;
+    #fruits: Array<Point>
 
     mode: Mode
 
@@ -45,8 +45,9 @@ export class SnakeGame extends EventTarget {
 
         this.grid = new Grid(gameMode.size);
         this.snake = new Snake(this.grid);
+        this.#fruits = new Array<Point>();
 
-        this.#renderer = new Renderer(renderingContext, this.snake, atlas, this.grid);
+        this.#renderer = new Renderer(renderingContext, this.snake, atlas, this.#fruits, this.grid);
 
         this.#spawnFruitRandom();
         this.#renderer.update();
@@ -220,7 +221,10 @@ export class SnakeGame extends EventTarget {
 
         if (result == "ateFruit") {
 
-            this.#fruitAmount--;
+            const toRemove = this.#fruits.find(p => p.equals(this.snake.head))
+            const index = this.#fruits.indexOf(toRemove);
+            this.#fruits[index] = this.#fruits[this.#fruits.length - 1];
+            this.#fruits.pop();
         }
     }
 
@@ -229,7 +233,7 @@ export class SnakeGame extends EventTarget {
      */
     #spawnFruitRandom(): void {
 
-        for (let i = 0; i < this.mode.fruitSpawnNumber && (this.#fruitAmount < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
+        for (let i = 0; i < this.mode.fruitSpawnNumber && (this.#fruits.length < this.mode.fruitMaxAmount || this.mode.fruitMaxAmount == 0); i++) {
 
             let rand = Math.random() * this.mode.fruitSpawnChance;
 
@@ -242,12 +246,12 @@ export class SnakeGame extends EventTarget {
                 let rand_x = Math.round(Math.random() * (this.grid.size - 1));
                 let rand_y = Math.round(Math.random() * (this.grid.size - 1));
 
-                let rand_point = new Point(rand_x, rand_y);
+                let point = new Point(rand_x, rand_y);
 
-                if (this.grid.getTile(rand_point) == EMPTY) {
+                if (this.grid.getTile(point) == EMPTY) {
 
-                    this.#fruitAmount++;
-                    this.grid.setTile(FRUIT, rand_point);
+                    this.#fruits.push(point);
+                    this.grid.setTile(FRUIT, point);
                     break;
                 }
 

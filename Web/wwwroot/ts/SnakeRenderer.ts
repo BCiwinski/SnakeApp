@@ -48,10 +48,14 @@ export default class Renderer {
 
     #atlas: HTMLImageElement;
 
-    constructor(renderingContext: CanvasRenderingContext2D, snake: Snake, snakeAtlas: HTMLImageElement, grid: Grid) {
+    #fruits: Array<Point>;
+
+    constructor(renderingContext: CanvasRenderingContext2D, snake: Snake, snakeAtlas: HTMLImageElement, fruits: Array<Point>, grid: Grid) {
 
         this.#snake = snake;
         this.#atlas = snakeAtlas;
+
+        this.#fruits = fruits;
 
         this.#context = renderingContext;
         this.#grid = grid;
@@ -69,9 +73,31 @@ export default class Renderer {
     update() {
         this.#context.clearRect(0, 0, this.#width, this.#height);
 
+        this.#drawFruits();
+
+        //draw snake
         this.#drawTail();
         this.#drawBody();
         this.#drawHead();
+    }
+
+    #drawFruits() {
+
+        this.#fruits.forEach(f => {
+
+            let atlasPos = new Point(0, 4);
+
+            this.#context.drawImage(
+                this.#atlas,
+                atlasPos.x * SpriteSize,
+                atlasPos.y * SpriteSize,
+                SpriteSize,
+                SpriteSize,
+                f.x * this.#tileHeight,
+                f.y * this.#tileWidth,
+                this.#tileWidth,
+                this.#tileHeight);
+        });
     }
 
     #drawTail() {
