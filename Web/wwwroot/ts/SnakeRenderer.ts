@@ -95,11 +95,11 @@ export default class Renderer {
 
         this.#fruits.forEach(f => {
 
-            //2^10 = 1024 for ten different fruits
-            const scale = 1024;
-            const random = Math.random() * scale;
+            //e^10 = 22026 for ten different fruits
+            const scale = 22000;
+            const random = (Math.random() * scale) + 1;
 
-            let atlasPos = new Point(10 - Math.round(Math.log2(random)), 4);
+            let atlasPos = new Point(10 - Math.ceil(Math.log(Math.round(random))), 4);
 
             this.#context.drawImage(
                 this.#atlas,
