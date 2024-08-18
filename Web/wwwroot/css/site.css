@@ -21,6 +21,13 @@ body {
   margin-bottom: 60px;
 }
 
+canvas#game-canvas {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border: 5px solid gray;
+    border-radius: 5%;
+}
+
 #game {
     aspect-ratio: 1/1;
     width: 60vmin;
@@ -31,25 +38,6 @@ body {
     display: grid;
     grid-template-columns: auto auto;
     gap: 2%;
-}
-
-.square {
-    aspect-ratio: 1/ 1;
-    display: block;
-    align-items: center;
-    background-color: lightgrey;
-}
-
-.square[head]{
-    background-color: green;
-}
-
-.square[snake]{
-    background-color: lightgreen;
-}
-
-.square[fruit]{
-    background-color: red;
 }
 
 aside {

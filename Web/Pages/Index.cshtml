@@ -20,7 +20,7 @@
         <ol id="leaderboards-list"></ol>
     </aside>
     <div id="game">
-        <div id="game-grid"></div>
+        <canvas id="game-canvas" width="1000" height="1000"></canvas>
     </div>
     <p id="game-message">Press one of the keys to begin.</p>
     <dialog id="scoreDialog">
@@ -33,6 +33,7 @@
             <input id="scoreDialogSubmit" type="submit" value="Submit" autofocus/>
         </div>
     </dialog>
+    <img id="game-snake-atlas" src="images/snake.svg" style="display: none" />
 </div>
 
 <script type="module">import * as index from "./ts/Index.js"</script>
