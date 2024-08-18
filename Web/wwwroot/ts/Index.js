@@ -83,13 +83,11 @@ function prepareGame(gameMode) {
     const context2d = canvas.getContext("2d");
     const snakeAtlas = $("#game-snake-atlas")[0];
     Game = new SnakeGame(gameMode, context2d, snakeAtlas);
-    Game.addEventListener("tick", onGameTick);
     Game.addEventListener("victory", onGameVictory);
     Game.addEventListener("failure", onGameFailure);
     GameEnded = false;
     return Game;
 }
-function onGameTick() { }
 /**
  * Finalazes the game when failed and uses '#game-message' for displaying failure message.
  * @param e - CustomEvenet having e.detail of type FailureEventDetail.
@@ -98,7 +96,6 @@ function onGameFailure(e) {
     let detail = e.detail;
     GameEnded = true;
     GameInProgess = false;
-    Game.removeEventListener("tick", onGameTick);
     Game.removeEventListener("victory", onGameVictory);
     Game.removeEventListener("failure", onGameFailure);
     let text = "Game over";
@@ -119,7 +116,6 @@ function onGameVictory(e) {
     let detail = e.detail;
     GameEnded = true;
     GameInProgess = false;
-    Game.removeEventListener("tick", onGameTick);
     Game.removeEventListener("victory", onGameFailure);
     Game.removeEventListener("failure", onGameFailure);
     $('#game-message')[0].innerHTML = `You won with a score of: ${detail.score}, playing: ${detail.gameMode}`;

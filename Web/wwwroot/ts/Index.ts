@@ -133,7 +133,6 @@ function prepareGame(gameMode: Mode): SnakeGame{
 
     Game = new SnakeGame(gameMode, context2d, snakeAtlas);
 
-    Game.addEventListener("tick", onGameTick);
     Game.addEventListener("victory", onGameVictory);
     Game.addEventListener("failure", onGameFailure);
 
@@ -141,8 +140,6 @@ function prepareGame(gameMode: Mode): SnakeGame{
 
     return Game;
 }
-
-function onGameTick() { }
 
 /**
  * Finalazes the game when failed and uses '#game-message' for displaying failure message.
@@ -155,7 +152,6 @@ function onGameFailure(e: CustomEvent) : void {
     GameEnded = true;
     GameInProgess = false;
 
-    Game.removeEventListener("tick", onGameTick);
     Game.removeEventListener("victory", onGameVictory);
     Game.removeEventListener("failure", onGameFailure);
 
@@ -186,7 +182,6 @@ function onGameVictory(e: CustomEvent) : void {
     GameEnded = true;
     GameInProgess = false;
 
-    Game.removeEventListener("tick", onGameTick);
     Game.removeEventListener("victory", onGameFailure);
     Game.removeEventListener("failure", onGameFailure);
 
