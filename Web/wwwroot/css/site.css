@@ -38,25 +38,6 @@ canvas#game-canvas {
     gap: 2%;
 }
 
-.square {
-    aspect-ratio: 1/ 1;
-    display: block;
-    align-items: center;
-    background-color: lightgrey;
-}
-
-.square[head]{
-    background-color: green;
-}
-
-.square[snake]{
-    background-color: lightgreen;
-}
-
-.square[fruit]{
-    background-color: red;
-}
-
 aside {
     width: 30%;
     padding-left: 15px;

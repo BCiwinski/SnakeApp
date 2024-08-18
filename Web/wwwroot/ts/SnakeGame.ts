@@ -10,11 +10,11 @@ export class SnakeGame extends EventTarget {
 
     tick: Event = new Event("tick");
 
-    element: HTMLElement
+    #element: HTMLElement
 
-    grid: Grid
+    #grid: Grid
 
-    snake: Snake
+    #snake: Snake
 
     #tick: number = 0;
 
@@ -43,10 +43,10 @@ export class SnakeGame extends EventTarget {
         super();
         this.mode = gameMode
 
-        this.grid = new Grid(gameMode.size);
-        this.snake = new Snake(this.grid);
+        this.#grid = new Grid(gameMode.size);
+        this.#snake = new Snake(this.#grid);
 
-        this.#renderer = new Renderer(renderingContext, this.snake, atlas, this.grid);
+        this.#renderer = new Renderer(renderingContext, this.#snake, atlas, this.#grid);
 
         this.#spawnFruitRandom();
         this.#renderer.update();
@@ -204,7 +204,7 @@ export class SnakeGame extends EventTarget {
             return;
         }
 
-        let result = this.snake.move(this.#currentDirection);
+        let result = this.#snake.move(this.#currentDirection);
 
         if (result == "isOutside") {
 
@@ -243,16 +243,16 @@ export class SnakeGame extends EventTarget {
 
             for (let j = 0; j < this.mode.fruitSpawnPositionTries; j++) {
 
-                let rand_x = Math.round(Math.random() * (this.grid.size - 1));
-                let rand_y = Math.round(Math.random() * (this.grid.size - 1));
+                let rand_x = Math.round(Math.random() * (this.#grid.size - 1));
+                let rand_y = Math.round(Math.random() * (this.#grid.size - 1));
 
                 let point = new Point(rand_x, rand_y);
 
-                if (this.grid.getTile(point) == EMPTY) {
+                if (this.#grid.getTile(point) == EMPTY) {
 
                     result.push(point);
                     this.#fruitsAmount++;
-                    this.grid.setTile(FRUIT, point);
+                    this.#grid.setTile(FRUIT, point);
                     break;
                 }
 
@@ -268,11 +268,11 @@ export class SnakeGame extends EventTarget {
      */
     #isWon(): boolean {
 
-    for (let i = 0; i < this.grid.size; i++) {
+    for (let i = 0; i < this.#grid.size; i++) {
 
-        for (let j = 0; j < this.grid.size; j++) {
+        for (let j = 0; j < this.#grid.size; j++) {
 
-            let tile = this.grid.getTile(new Point(i, j));
+            let tile = this.#grid.getTile(new Point(i, j));
 
             if (tile == EMPTY || tile == FRUIT) {
 
@@ -298,7 +298,7 @@ export class SnakeGame extends EventTarget {
         let lengthMultiplier = 10;
         let quotient = Math.sqrt(this.#tick);
 
-        return Math.ceil((this.snake.length() * lengthMultiplier) / quotient);
+        return Math.ceil((this.#snake.length() * lengthMultiplier) / quotient);
     }
 }
 
