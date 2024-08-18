@@ -72,7 +72,10 @@ class Renderer {
 }
 _Renderer_context = new WeakMap(), _Renderer_grid = new WeakMap(), _Renderer_width = new WeakMap(), _Renderer_height = new WeakMap(), _Renderer_tileWidth = new WeakMap(), _Renderer_tileHeight = new WeakMap(), _Renderer_snake = new WeakMap(), _Renderer_atlas = new WeakMap(), _Renderer_fruits = new WeakMap(), _Renderer_snakeEndBefore = new WeakMap(), _Renderer_instances = new WeakSet(), _Renderer_drawFruits = function _Renderer_drawFruits() {
     __classPrivateFieldGet(this, _Renderer_fruits, "f").forEach(f => {
-        let atlasPos = new Point(0, 4);
+        //2^8 = 256 for eight different fruits
+        const scale = 256;
+        const random = Math.random() * scale;
+        let atlasPos = new Point(8 - Math.round(Math.log2(random)), 4);
         __classPrivateFieldGet(this, _Renderer_context, "f").drawImage(__classPrivateFieldGet(this, _Renderer_atlas, "f"), atlasPos.x * SpriteSize, atlasPos.y * SpriteSize, SpriteSize, SpriteSize, f.x * __classPrivateFieldGet(this, _Renderer_tileHeight, "f"), f.y * __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileWidth, "f"), __classPrivateFieldGet(this, _Renderer_tileHeight, "f"));
     });
     __classPrivateFieldSet(this, _Renderer_fruits, new Array(), "f");
