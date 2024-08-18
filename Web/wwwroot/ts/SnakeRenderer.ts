@@ -75,9 +75,10 @@ export default class Renderer {
     }
 
     /**
-     * Redraws the game on CanvasRenderingContext2D used for this object's construction.
+     * Redraws snakes head and tail to match snake's state. Needs to be called every tick to work properly.
+     * Draws fruits added with addFruits() before calling this.
      */
-    update() {
+    update() : void {
 
         this.#drawFruits();
 
@@ -86,12 +87,19 @@ export default class Renderer {
         this.#drawHead();
     }
 
-    addFruits(fruits: Array<Point>) {
+    /**
+     * Sets fruits to draw in next update() call.
+     * @param fruits - points, where fruits will be drawn.
+     */
+    addFruits(fruits: Array<Point>) : void {
 
         this.#fruits = fruits;
     }
 
-    #drawFruits() {
+    /**
+     * Draws fruits set by addFruit().
+     */
+    #drawFruits() : void {
 
         this.#fruits.forEach(f => {
 
@@ -99,6 +107,7 @@ export default class Renderer {
             const scale = 22000;
             const random = (Math.random() * scale) + 1;
 
+            //make first fruits (like (0,4)) very probable and last one (like(9,4)) very improbable
             let atlasPos = new Point(10 - Math.ceil(Math.log(Math.round(random))), 4);
 
             this.#context.drawImage(
@@ -116,7 +125,10 @@ export default class Renderer {
         this.#fruits = new Array<Point>();
     }
 
-    #drawTail() {
+    /**
+     * Clears previous tail's position and redraws in the current one.
+     */
+    #drawTail() : void {
 
         let pos: Point = this.#snake.body[0];
         let previous: Point;
@@ -156,7 +168,11 @@ export default class Renderer {
         this.#snakeEndBefore = pos;
     }
 
-    #drawBody() {
+    /**
+     * Redraws parts of snake's body that need changing.
+     * Clears previous head's position and draws a part of body.
+     */
+    #drawBody() : void {
 
         if (this.#snake.length() < 2) {
             return;
@@ -189,7 +205,10 @@ export default class Renderer {
             this.#tileHeight);
     }
 
-    #drawHead() {
+    /**
+     * Draws snake's head over wheatever was in that space previously.
+     */
+    #drawHead() : void {
 
         let head: Point = this.#snake.head;
         let next: Point = this.#snake.body[this.#snake.length() - 1];
@@ -215,6 +234,21 @@ export default class Renderer {
             this.#tileHeight);
     }
 
+    /**
+     * Gets an orientation 'of' a point that's between 'previous' and 'next'.
+     * This orientation represents how point 'of' needs to connect to 'previous' and 'next'
+     * to create a continous piece.
+     * 
+     * Only 'next' and 'previous' that are left/right/above/below
+     * 'of' are valid.
+     * 
+     * There is no distinction between "bent" orientations when
+     * 'next' and 'previous' are swapped. For example there is "leftToDown", but no "downToLeft".
+     * @param of
+     * @param previous
+     * @param next
+     * @returns
+     */
     #getOrientation(of: Point, previous: Point, next: Point) : Orientation {
 
         const previousStraight: StraightOrientation = this.#getStraightOrientation(of, previous);
@@ -283,6 +317,16 @@ export default class Renderer {
 
     }
 
+    /**
+     * Gets a "straight" orientation 'of' a point in relation to 'previous'.
+     * This orientation represents the direction you need to travel from 'previous'
+     * to 'of'.
+     * 
+     * Only 'previous' that is left/right/above/below 'of' is valid.
+     * @param of
+     * @param previous
+     * @returns
+     */
     #getStraightOrientation(of: Point, previous: Point) : StraightOrientation {
 
         let result: StraightOrientation = "invalid";
@@ -309,6 +353,10 @@ export default class Renderer {
         return result;
     }
 
+    /**
+     * Clears #context's graphics in a region corresponding to given 'position'.
+     * @param position
+     */
     #clearTile(position: Point) : void {
 
         this.#context.clearRect(
