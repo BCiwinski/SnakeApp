@@ -1,6 +1,6 @@
 # Snake App
 
-A simple, configurable, snake game drawn on a grid of squares.
+A simple, configurable, snake game with leaderboards. Drawn on HTML canvas.
 
 ## Features / tech stack:
 - Game's webpage - `Razor Pages / HTML / CSS`
